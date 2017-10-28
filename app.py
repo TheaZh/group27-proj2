@@ -2,6 +2,9 @@ import re, sys
 from googleapiclient.discovery import build
 import urllib2
 from bs4 import BeautifulSoup
+from NLPCore import NLPCoreClient
+
+STANFORD_PATH = '../stanford-corenlp-full-2017-06-09'
 
 # get URLs list
 def search_google(google_api, google_engine_id, query):
@@ -9,6 +12,7 @@ def search_google(google_api, google_engine_id, query):
     res = service.cse().list(q=query, cx=google_engine_id, ).execute()
     URLs = []
     for item in res['items']:
+        print item
         print "URL: ", item['link']
         # append url into url list
         URLs.append(item['link'])
@@ -25,20 +29,39 @@ def get_plain_text(url):
         script.decompose()  # rip it out
 
     # get text
+    text = soup.get_text()
     text = ''
     for string in soup.stripped_strings:
         text = text + ' ' + string
+    print text
     return text
 
+# get sentences from plain text
+def get_sentence(plain_txt):
+    client = NLPCoreClient('/path/to/stanford-corenlp-full-2017-06-09')
+    properties = {
+        "annotators": "tokenize,ssplit,pos,lemma,ner",
+        "parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
+        "ner.useSUTime": "0"
+    }
+    doc = client.annotate(text=plain_txt, properties=properties)
+    sentences = []
+    for sentence in doc.sentences:
+        newsentence = ""
+        for x in sentence.tokens:
+            newsentence += " " + x.word
+        sentences.append(newsentence)
+    print sentences
 
 if __name__ == '__main__':
 
     api = "AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo"
     engine = "018258045116810257593:z1fmkqqt_di"
-    query = "baidu"
-    #search_google(api, engine, query)
-    get_plain_text('http://www.baidu.com')
-
+    query = "per se"
+    # search_google(api, engine, query)
+    # get_plain_text('http://www.baidu.com')
+    # plain_txt = "Bill Gates works at Microsoft. Sergei works at Google. abc is abc, and it is not def"
+    # get_sentence(plain_txt)
 
 
 
