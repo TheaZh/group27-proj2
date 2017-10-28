@@ -5,6 +5,18 @@ from bs4 import BeautifulSoup
 from NLPCore import NLPCoreClient
 
 STANFORD_PATH = '../stanford-corenlp-full-2017-06-09'
+client = NLPCoreClient(STANFORD_PATH)
+properties_pipeline1 = {
+	"annotators": "tokenize,ssplit,pos,lemma,ner",
+	"parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
+	"ner.useSUTime": "0"
+	}
+properties_pipeline2 = {
+	"annotators": "tokenize,ssplit,pos,lemma,ner,parse,relation",
+	"parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
+	"ner.useSUTime": "0"
+	}
+groups = ['Live_In', 'Located_In', 'OrgBased_In', 'Work_For']
 
 # get URLs list
 def search_google(google_api, google_engine_id, query):
@@ -37,14 +49,8 @@ def get_plain_text(url):
     return text
 
 # get sentences from plain text
-def get_sentence(plain_txt):
-    client = NLPCoreClient('/path/to/stanford-corenlp-full-2017-06-09')
-    properties = {
-        "annotators": "tokenize,ssplit,pos,lemma,ner",
-        "parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
-        "ner.useSUTime": "0"
-    }
-    doc = client.annotate(text=plain_txt, properties=properties)
+def get_sentences(plain_txt):
+    doc = client.annotate(text=plain_txt, properties=properties_pipeline1)
     sentences = []
     for sentence in doc.sentences:
         newsentence = ""
@@ -52,6 +58,32 @@ def get_sentence(plain_txt):
             newsentence += " " + x.word
         sentences.append(newsentence)
     print sentences
+    return sentences
+
+# analyze sentences to extract tuples
+def extract_tuples(sentences, group_id, threshold):
+    tuples = []
+    group = groups[group_id]
+    doc = client.annotate(text=sentences, properties=properties_pipeline2)
+    for index in range(0, len(sentences)):
+        if len(doc.sentences[index].relations) is 0\
+                or doc.sentences[1].relations[0].probabilities.keys()[0] is not group:
+            continue
+        word1 = doc.sentences[0].entities[0].value
+        word2 = doc.sentences[0].entities[1].value
+        confidence = doc.sentences[0].relations[0].probabilities[group]
+        if confidence>=threshold:
+            tuple = []
+            tuple.append(word1)
+            tuple.append(word2)
+            tuple.append(confidence)
+            tuples.append(tuple)
+    return tuples
+
+
+
+
+
 
 if __name__ == '__main__':
 
@@ -62,6 +94,11 @@ if __name__ == '__main__':
     # get_plain_text('http://www.baidu.com')
     # plain_txt = "Bill Gates works at Microsoft. Sergei works at Google. abc is abc, and it is not def"
     # get_sentence(plain_txt)
+    test = ['1','2']
+    test.append('3')
+
+    # sort
+    # sort(tuples, key=lambda x: -x[3])
 
 
 

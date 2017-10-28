@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="CoreNLP-to-HTML.xsl" type="text/xsl"?>
+<root>
+  <document>
+    <sentences>
+      <sentence id="1">
+        <tokens>
+          <token id="1">
+            <word>Bill</word>
+            <lemma>Bill</lemma>
+            <CharacterOffsetBegin>0</CharacterOffsetBegin>
+            <CharacterOffsetEnd>4</CharacterOffsetEnd>
+            <POS>NNP</POS>
+            <NER>PERSON</NER>
+          </token>
+          <token id="2">
+            <word>Gates</word>
+            <lemma>Gates</lemma>
+            <CharacterOffsetBegin>5</CharacterOffsetBegin>
+            <CharacterOffsetEnd>10</CharacterOffsetEnd>
+            <POS>NNP</POS>
+            <NER>PERSON</NER>
+          </token>
+          <token id="3">
+            <word>works</word>
+            <lemma>work</lemma>
+            <CharacterOffsetBegin>11</CharacterOffsetBegin>
+            <CharacterOffsetEnd>16</CharacterOffsetEnd>
+            <POS>VBZ</POS>
+            <NER>O</NER>
+          </token>
+          <token id="4">
+            <word>at</word>
+            <lemma>at</lemma>
+            <CharacterOffsetBegin>17</CharacterOffsetBegin>
+            <CharacterOffsetEnd>19</CharacterOffsetEnd>
+            <POS>IN</POS>
+            <NER>O</NER>
+          </token>
+          <token id="5">
+            <word>Microsoft</word>
+            <lemma>Microsoft</lemma>
+            <CharacterOffsetBegin>20</CharacterOffsetBegin>
+            <CharacterOffsetEnd>29</CharacterOffsetEnd>
+            <POS>NNP</POS>
+            <NER>ORGANIZATION</NER>
+          </token>
+          <token id="6">
+            <word>.</word>
+            <lemma>.</lemma>
+            <CharacterOffsetBegin>29</CharacterOffsetBegin>
+            <CharacterOffsetEnd>30</CharacterOffsetEnd>
+            <POS>.</POS>
+            <NER>O</NER>
+          </token>
+        </tokens>
+        <parse>(ROOT (S (NP (NNP Bill) (NNP Gates)) (VP (VBZ works) (PP (IN at) (NP (NNP Microsoft)))) (. .))) </parse>
+        <dependencies type="basic-dependencies">
+          <dep type="root">
+            <governor idx="0">ROOT</governor>
+            <dependent idx="3">works</dependent>
+          </dep>
+          <dep type="compound">
+            <governor idx="2">Gates</governor>
+            <dependent idx="1">Bill</dependent>
+          </dep>
+          <dep type="nsubj">
+            <governor idx="3">works</governor>
+            <dependent idx="2">Gates</dependent>
+          </dep>
+          <dep type="case">
+            <governor idx="5">Microsoft</governor>
+            <dependent idx="4">at</dependent>
+          </dep>
+          <dep type="nmod">
+            <governor idx="3">works</governor>
+            <dependent idx="5">Microsoft</dependent>
+          </dep>
+          <dep type="punct">
+            <governor idx="3">works</governor>
+            <dependent idx="6">.</dependent>
+          </dep>
+        </dependencies>
+        <dependencies type="collapsed-dependencies">
+          <dep type="root">
+            <governor idx="0">ROOT</governor>
+            <dependent idx="3">works</dependent>
+          </dep>
+          <dep type="compound">
+            <governor idx="2">Gates</governor>
+            <dependent idx="1">Bill</dependent>
+          </dep>
+          <dep type="nsubj">
+            <governor idx="3">works</governor>
+            <dependent idx="2">Gates</dependent>
+          </dep>
+          <dep type="case">
+            <governor idx="5">Microsoft</governor>
+            <dependent idx="4">at</dependent>
+          </dep>
+          <dep type="nmod:at">
+            <governor idx="3">works</governor>
+            <dependent idx="5">Microsoft</dependent>
+          </dep>
+          <dep type="punct">
+            <governor idx="3">works</governor>
+            <dependent idx="6">.</dependent>
+          </dep>
+        </dependencies>
+        <dependencies type="collapsed-ccprocessed-dependencies">
+          <dep type="root">
+            <governor idx="0">ROOT</governor>
+            <dependent idx="3">works</dependent>
+          </dep>
+          <dep type="compound">
+            <governor idx="2">Gates</governor>
+            <dependent idx="1">Bill</dependent>
+          </dep>
+          <dep type="nsubj">
+            <governor idx="3">works</governor>
+            <dependent idx="2">Gates</dependent>
+          </dep>
+          <dep type="case">
+            <governor idx="5">Microsoft</governor>
+            <dependent idx="4">at</dependent>
+          </dep>
+          <dep type="nmod:at">
+            <governor idx="3">works</governor>
+            <dependent idx="5">Microsoft</dependent>
+          </dep>
+          <dep type="punct">
+            <governor idx="3">works</governor>
+            <dependent idx="6">.</dependent>
+          </dep>
+        </dependencies>
+        <dependencies type="enhanced-dependencies">
+          <dep type="root">
+            <governor idx="0">ROOT</governor>
+            <dependent idx="3">works</dependent>
+          </dep>
+          <dep type="compound">
+            <governor idx="2">Gates</governor>
+            <dependent idx="1">Bill</dependent>
+          </dep>
+          <dep type="nsubj">
+            <governor idx="3">works</governor>
+            <dependent idx="2">Gates</dependent>
+          </dep>
+          <dep type="case">
+            <governor idx="5">Microsoft</governor>
+            <dependent idx="4">at</dependent>
+          </dep>
+          <dep type="nmod:at">
+            <governor idx="3">works</governor>
+            <dependent idx="5">Microsoft</dependent>
+          </dep>
+          <dep type="punct">
+            <governor idx="3">works</governor>
+            <dependent idx="6">.</dependent>
+          </dep>
+        </dependencies>
+        <dependencies type="enhanced-plus-plus-dependencies">
+          <dep type="root">
+            <governor idx="0">ROOT</governor>
+            <dependent idx="3">works</dependent>
+          </dep>
+          <dep type="compound">
+            <governor idx="2">Gates</governor>
+            <dependent idx="1">Bill</dependent>
+          </dep>
+          <dep type="nsubj">
+            <governor idx="3">works</governor>
+            <dependent idx="2">Gates</dependent>
+          </dep>
+          <dep type="case">
+            <governor idx="5">Microsoft</governor>
+            <dependent idx="4">at</dependent>
+          </dep>
+          <dep type="nmod:at">
+            <governor idx="3">works</governor>
+            <dependent idx="5">Microsoft</dependent>
+          </dep>
+          <dep type="punct">
+            <governor idx="3">works</governor>
+            <dependent idx="6">.</dependent>
+          </dep>
+        </dependencies>
+        <MachineReading>
+          <entities>
+            <entity id="EntityMention-1">PEOPLE
+              <span start="1" end="2"/>
+              <probabilities/>
+            </entity>
+            <entity id="EntityMention-2">ORGANIZATION
+              <span start="4" end="5"/>
+              <probabilities/>
+            </entity>
+          </entities>
+          <relations>
+            <relation id="RelationMention-1">OrgBased_In
+              <arguments>
+                <entity id="EntityMention-1">PEOPLE
+                  <span start="1" end="2"/>
+                  <probabilities/>
+                </entity>
+                <entity id="EntityMention-2">ORGANIZATION
+                  <span start="4" end="5"/>
+                  <probabilities/>
+                </entity>
+              </arguments>
+              <probabilities>
+                <probability>
+                  <label>OrgBased_In</label>
+                  <value>0.39717886837934685</value>
+                </probability>
+                <probability>
+                  <label>Work_For</label>
+                  <value>0.2072271415708158</value>
+                </probability>
+                <probability>
+                  <label>_NR</label>
+                  <value>0.18107178574908858</value>
+                </probability>
+                <probability>
+                  <label>Located_In</label>
+                  <value>0.11392489275533632</value>
+                </probability>
+                <probability>
+                  <label>Live_In</label>
+                  <value>0.1005973115454124</value>
+                </probability>
+              </probabilities>
+            </relation>
+            <relation id="RelationMention-2">Work_For
+              <arguments>
+                <entity id="EntityMention-2">ORGANIZATION
+                  <span start="4" end="5"/>
+                  <probabilities/>
+                </entity>
+                <entity id="EntityMention-1">PEOPLE
+                  <span start="1" end="2"/>
+                  <probabilities/>
+                </entity>
+              </arguments>
+              <probabilities>
+                <probability>
+                  <label>Work_For</label>
+                  <value>0.2625665274406702</value>
+                </probability>
+                <probability>
+                  <label>OrgBased_In</label>
+                  <value>0.2589269913408607</value>
+                </probability>
+                <probability>
+                  <label>Located_In</label>
+                  <value>0.23011518386734892</value>
+                </probability>
+                <probability>
+                  <label>Live_In</label>
+                  <value>0.1381332361516736</value>
+                </probability>
+                <probability>
+                  <label>_NR</label>
+                  <value>0.11025806119944687</value>
+                </probability>
+              </probabilities>
+            </relation>
+          </relations>
+        </MachineReading>
+      </sentence>
+    </sentences>
+  </document>
+</root>
