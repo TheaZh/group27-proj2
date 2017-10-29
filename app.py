@@ -3,6 +3,7 @@ from googleapiclient.discovery import build
 import urllib2
 from bs4 import BeautifulSoup
 from NLPCore import NLPCoreClient
+import decimal
 
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
@@ -130,7 +131,7 @@ def relation_print_format(result_tuples, relation_type):
           'Number of tuples after pruning: ' , len(result_tuples) , '\n' \
           '================== ALL RELATIONS ================='
     for tuple in result_tuples:
-        print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20),str(tuple[2]).ljust(10), tuple[0].ljust(37), tuple[1])
+        print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20), str(decimal.Decimal("%.3f" % float(tuple[2]))).ljust(10), tuple[0].ljust(37), tuple[1])
 
 
 
