@@ -54,7 +54,7 @@ def get_plain_text(url):
     for string in soup.stripped_strings:
         text = text + ' ' + string
     # text = text.encode()
-    print 'text: ', text
+    # print 'text: ', text
     # return as an array format
     return [text.encode('utf-8')]
 
@@ -64,6 +64,7 @@ def from_words_to_sentence(sentence):
     for x in sentence.tokens:
         newsentence += " " + x.word
     return newsentence
+
 # get sentences from plain text
 def get_sentences(plain_txt):
     doc = client.annotate(text=plain_txt, properties=properties_pipeline1)
@@ -80,50 +81,54 @@ def extract_tuples(query_sentences, relation_group, threshold):
     num_of_relations = 0  # the overall number of relations extracted from this website
     num_of_valid_relations = 0 # the number of valid relations (including relations whose confidence below threshold)
     tuples = []
-    doc = client.annotate(text=query_sentences, properties=properties_pipeline2)
-    sentences = doc.sentences
-    for sentence in sentences:
-        print " --- ", from_words_to_sentence(sentence)
-        relations = sentence.relations
-        if len(relations) is 0:
-            continue
-        for relation in relations:
-            if not relation:
-                # print 'len 0'
+
+    try:
+        for sentence in query_sentences:
+            print " --- ", sentence
+            doc = client.annotate(text=[sentence], properties=properties_pipeline2)
+            relations = doc.sentences[0].relations
+            if len(relations) is 0:
                 continue
-            num_of_relations += 1 # count relations
-            # print "Relation:::::::", relation, "\ntype:::::", relation.probabilities.keys()[0]
-            probability_dic = sorted(relation.probabilities.items(), key=lambda (k, v) : -float(v))
-            if probability_dic[0][0] == relation_group:
-                num_of_valid_relations += 1 # count valid relations
-                word1 = relation.entities[0].value
-                type1 = relation.entities[0].type
-                word2 = relation.entities[1].value
-                type2 = relation.entities[1].type
-                confidence = float(relation.probabilities[relation_group])
+            try:
+                for relation in relations:
+                    if not relation:
+                        # print 'len 0'
+                        continue
+                    num_of_relations += 1 # count relations
+                    # print "Relation:::::::", relation, "\ntype:::::", relation.probabilities.keys()[0]
+                    probability_dic = sorted(relation.probabilities.items(), key=lambda (k, v) : -float(v))
+                    if probability_dic[0][0] == relation_group:
+                        num_of_valid_relations += 1 # count valid relations
+                        word1 = relation.entities[0].value
+                        type1 = relation.entities[0].type
+                        word2 = relation.entities[1].value
+                        type2 = relation.entities[1].type
+                        confidence = float(relation.probabilities[relation_group])
 
-                plain_sentence = from_words_to_sentence(sentence)
+                        print '============== EXTRACTED RELATION =============='
+                        print 'Sentence:' , sentence
+                        print 'Relation Type:', relation_group, ' | ' \
+                              'Confidence=', confidence, ' | ' \
+                              'EntityType1=', type1, ' | ' \
+                              'EntityValue1=', word1, ' | ' \
+                              'EntityType2=', type2, ' | ' \
+                              'EntityValue2=', word2
+                        print '============== END OF RELATION DESC =============='
 
-                print '============== EXTRACTED RELATION =============='
-                print 'Sentence:' , plain_sentence
-                print 'Relation Type:', relation_group, ' | ' \
-                      'Confidence=', confidence, ' | ' \
-                      'EntityType1=', type1, ' | ' \
-                      'EntityValue1=', word1, ' | ' \
-                      'EntityType2=', type2, ' | ' \
-                      'EntityValue2=', word2
-                print '============== END OF RELATION DESC =============='
-
-                # save tuples whose confidence above threshold
-                if confidence >= threshold:
-                    tuple = []
-                    tuple.append(word1+' ('+type1+')')
-                    tuple.append(word2+' ('+type2+')')
-                    tuple.append(round(confidence,3))
-                    tuples.append(tuple)
-            # print tuple
-    print 'Relations extracted from this website: ' , num_of_valid_relations , ' (Overall: ' , num_of_relations , ')'
-    return tuples
+                        # save tuples whose confidence above threshold
+                        if confidence >= threshold:
+                            tuple = []
+                            tuple.append(word1+' ('+type1+')')
+                            tuple.append(word2+' ('+type2+')')
+                            tuple.append(round(confidence,3))
+                            tuples.append(tuple)
+                    # print tuple
+            except:
+                print '---------- Relation Error ----------'
+        print 'Relations extracted from this website: ' , num_of_valid_relations , ' (Overall: ' , num_of_relations , ')'
+        return tuples
+    except:
+        print '---------- Sentence Error ----------'
 
 
 def relation_print_format(result_tuples, relation_type):
@@ -217,9 +222,7 @@ if __name__ == '__main__':
     # get 10 urls
     # URLs = search_google(GOOGLE_API, GOOGLE_ENGINE_ID, query)
 
-    URLs = ['https://en.wikipedia.org/wiki/Bill_Gates']
-            # 'https://news.microsoft.com/exec/bill-gates/',
-            #'https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017', 'https://www.biography.com/people/bill-gates-9307520', 'http://www.telegraph.co.uk/technology/0/bill-gates/', 'https://www.cnbc.com/2017/09/25/bill-gates-microsoft-ceo-satya-nadella-talk-about-leadership.html', 'http://www.zdnet.com/article/bill-gates-stake-in-microsoft-is-now-just-1-3-percent/', 'https://www.wsj.com/articles/a-rare-joint-interview-with-microsoft-ceo-satya-nadella-and-bill-gates-1506358852', 'https://twitter.com/billgates', 'https://www.youtube.com/watch?v=rOqMawDj0LQ']
+    URLs = ['https://news.microsoft.com/exec/bill-gates/','https://en.wikipedia.org/wiki/Bill_Gates','https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017', 'https://www.biography.com/people/bill-gates-9307520', 'http://www.telegraph.co.uk/technology/0/bill-gates/', 'https://www.cnbc.com/2017/09/25/bill-gates-microsoft-ceo-satya-nadella-talk-about-leadership.html', 'http://www.zdnet.com/article/bill-gates-stake-in-microsoft-is-now-just-1-3-percent/', 'https://www.wsj.com/articles/a-rare-joint-interview-with-microsoft-ceo-satya-nadella-and-bill-gates-1506358852', 'https://twitter.com/billgates', 'https://www.youtube.com/watch?v=rOqMawDj0LQ']
 
 
     print "URLs: ", URLs
@@ -229,11 +232,12 @@ if __name__ == '__main__':
 
     for url in URLs:
         print 'Processing: ' + url
-        # plain_text = get_plain_text(url)
-        plain_text = ['William Henry Gates III (born October 28, 1955) is an American business magnate , investor , author , philanthropist , and co-founder of the Microsoft Corporation along with Paul Allen.']
+        plain_text = get_plain_text(url)
+        # plain_text = ['William Henry Gates III (born October 28, 1955) is an American business magnate , investor , author , philanthropist , and co-founder of the Microsoft Corporation along with Paul Allen.']
         sentences = get_sentences(plain_text)
-        print sentences
-        tuples = extract_tuples(sentences, relation_group, threshold)
+        # print sentences
+        tuples = []
+        tuples.extend(extract_tuples(sentences, relation_group, threshold))
         if len(tuples) <1:
             continue
         else:
