@@ -162,13 +162,13 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                 visited_urls.add(url)
                 # a. retreive webpage b. extract plain text
                 plain_text = get_plain_text(url)
+                print plain_text
                 # c. annotate
                 print "parsing passage..."
-                print plain_text
                 sentences = get_sentences(plain_text)
+                print sentences
                 # analyze sentences to extract tuples
                 print "extracting relations..."
-                print sentences
                 tuples = extract_tuples(sentences, relation_group, threshold)
                 if len(tuples) > 0:
                     # remove dup
@@ -205,7 +205,7 @@ if __name__ == '__main__':
     r = 4
     t = 0.22
     q = "bill gates microsoft"
-    k = 5
+    k = 2
     if len(sys.argv) > 1:
         api_key = sys.argv[1]
         engine_id = sys.argv[2]
