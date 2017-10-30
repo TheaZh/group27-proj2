@@ -177,7 +177,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             # sort to generate new query
             tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
             found_a_new_query = True
-            for tup in t:
+            for tup in tuple_list:
                 potential_query = tup[0][0] + " " + tup[1][0]
                 if potential_query not in visited_queries:
                     query = potential_query
