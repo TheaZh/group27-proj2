@@ -187,12 +187,12 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                     found_a_new_query = False
             if not found_a_new_query:
                 print "Cannot find >=k results with q and k for t. Exit."
-            else: # for testing
-                print "new query is: ", query
-                break
-        break # for testing
+            #else: # for testing
+            #    print "new query is: ", query
+            #    break
+        # break # for testing
 
-    relation_print_format(tuple_set, relation_group)
+    relation_print_format(tuple_list, relation_group)
 
     print 'End of story......................................................'
     sys.exit(0)
