@@ -190,6 +190,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             else: # for testing
                 print "new query is: ", query
                 break
+        break # for testing
 
     relation_print_format(tuple_set, relation_group)
 
