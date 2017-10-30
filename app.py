@@ -19,7 +19,7 @@ properties_pipeline1 = {
 	"ner.useSUTime": "0"
 	}
 properties_pipeline2 = {
-	"annotators": "tokenize,ssplit,pos,lemma,ner,parse,relation",
+	"annotators": "tokenize,ssplit,pos,lemma,ner,parse",
 	"parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
 	"ner.useSUTime": "0"
 	}
@@ -117,12 +117,13 @@ def extract_tuples(query_sentences, relation_group, threshold):
 
                         # save tuples whose confidence above threshold
                         if confidence >= threshold:
-                            tuple = []
-                            tuple.append(word1+' ('+type1+')')
-                            tuple.append(word2+' ('+type2+')')
-                            tuple.append(round(confidence,3))
-                            tuples.append(tuple)
-                    # print tuple
+                            tup = []
+                            tup.append((word1, type1))
+                            tup.append((word2, type2))
+                            tup.append(round(confidence,3))
+                            tuples.append(tup)
+                            print 'here is one tuple: the tuple looks like this:'
+                            print tup
             except:
                 print '---------- Relation Error ----------'
         print 'Relations extracted from this website: ' , num_of_valid_relations , ' (Overall: ' , num_of_relations , ')'
@@ -139,11 +140,81 @@ def relation_print_format(result_tuples, relation_type):
         print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20), str(decimal.Decimal("%.3f" % float(tuple[2]))).ljust(10), tuple[0].ljust(37), tuple[1])
 
 
+def main(api_key, engine_id, relation_id, threshold, query, k):
+    print 'query: ', query
+    relation_group = groups[relation_id-1]
+    print 'ralations type: ', relation_group
 
+    visited_tuples = set()
+    visited_urls = set()
+    visited_queries = set()
+    tuple_list = []
+    while len(tuple_list) < k:
+        # Google CSE
+        print "fetching urls form Google CSE..."
+        URLs = search_google(api_key, engine_id, query)
+        visited_queries.add(query)
 
+        for url in URLs:
+            if url in visited_urls:
+                continue
+            visited_urls.add(url)
+            # a. retreive webpage b. extract plain text
+            plain_text = get_plain_text(url)
+            # c. annotate
+            print "parsing passage..."
+            sentences = get_sentences(plain_text)
+            # analyze sentences to extract tuples
+            print "extracting relations..."
+            tuples = extract_tuples(sentences, relation_group, threshold)
+            if len(tuples) > 0:
+                # remove dup
+                for t in tuples:
+                    if t in visited_tuples:
+                        continue
+                    visited_tuples.add(t)
+                    tuple_list.append(t)
+            # sort to generate new query
+            tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
+            found_a_new_query = True
+            for tup in t:
+                potential_query = tup[0][0] + " " + tup[1][0]
+                if potential_query not in visited_queries:
+                    query = potential_query
+                    found_a_new_query = True
+                    break
+                else:
+                    found_a_new_query = False
+            if not found_a_new_query:
+                print "Cannot find >=k results with q and k for t. Exit."
+            else: # for testing
+                print "new query is: ", query
+                break
+
+    relation_print_format(tuple_set, relation_group)
+
+    print 'End of story......................................................'
+    sys.exit(0)
 
 
 if __name__ == '__main__':
+    api_key = GOOGLE_API
+    engine_id = GOOGLE_ENGINE_ID
+    r = 4
+    t = 0.22
+    q = "bill gates microsoft"
+    k = 5
+    if len(sys.argv) > 1:
+        api_key = sys.argv[1]
+        engine_id = sys.argv[2]
+        r = int(sys.argv[3])
+        t = float(sys.argv[4])
+        q = sys.argv[5]
+        k = sys.argv[6]
+
+    main(api_key, engine_id, r, t, q, k)
+
+
     '''
     if len(sys.argv) >=0 and len(sys.argv)<7:
         print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
@@ -238,7 +309,7 @@ if __name__ == '__main__':
         # print sentences
         tuples = []
         tuples.extend(extract_tuples(sentences, relation_group, threshold))
-        if len(tuples) <1:
+        if len(tuples) < 1:
             continue
         else:
             result_tuples.extend(tuples)
@@ -254,4 +325,3 @@ if __name__ == '__main__':
     #############################################
     #             End of Debug
     #############################################
-
