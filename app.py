@@ -157,15 +157,18 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
         visited_queries.add(query)
 
         for url in URLs:
+            print url
             if url not in visited_urls:
                 visited_urls.add(url)
                 # a. retreive webpage b. extract plain text
                 plain_text = get_plain_text(url)
                 # c. annotate
                 print "parsing passage..."
+                print plain_text
                 sentences = get_sentences(plain_text)
                 # analyze sentences to extract tuples
                 print "extracting relations..."
+                print sentences
                 tuples = extract_tuples(sentences, relation_group, threshold)
                 if len(tuples) > 0:
                     # remove dup
