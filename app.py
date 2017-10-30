@@ -19,7 +19,7 @@ properties_pipeline1 = {
     "ner.useSUTime": "0"
     }
 properties_pipeline2 = {
-    "annotators": "tokenize,ssplit,pos,lemma,ner,parse",
+    "annotators": "tokenize,ssplit,pos,lemma,ner,parse,relation",
     "parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
     "ner.useSUTime": "0"
     }
@@ -116,6 +116,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
                         print '============== END OF RELATION DESC =============='
 
                         # save tuples whose confidence above threshold
+                        print "confidence is : ", confidence
                         if confidence >= threshold:
                             tup = []
                             tup.append((word1, type1))
@@ -127,6 +128,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
             except:
                 print '---------- Relation Error ----------'
         print 'Relations extracted from this website: ' , num_of_valid_relations , ' (Overall: ' , num_of_relations , ')'
+        print tuples
         return tuples
     except:
         print '---------- Sentence Error ----------'
@@ -206,6 +208,14 @@ if __name__ == '__main__':
     t = 0.22
     q = "bill gates microsoft"
     k = 2
+
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        text = ["In June 2006, Gates announced that he would be transitioning from full-time work at Microsoft to part-time work and full-time work at the Bill & Melinda Gates Foundation".encode('utf-8')]
+        sentences = get_sentences(text)
+        print sentences
+        extract_tuples(sentences, "Work_For", 0.2)
+        sys.exit(0)
+
     if len(sys.argv) > 1:
         api_key = sys.argv[1]
         engine_id = sys.argv[2]
