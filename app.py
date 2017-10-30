@@ -159,30 +159,31 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
         visited_queries.add(query)
 
         for url in URLs:
-            print url
             if url not in visited_urls:
+                print url
                 visited_urls.add(url)
                 # a. retreive webpage b. extract plain text
                 plain_text = get_plain_text(url)
-                print plain_text
+                # print plain_text
                 # c. annotate
                 print "parsing passage..."
                 sentences = get_sentences(plain_text)
-                print sentences
+                # print sentences
                 # analyze sentences to extract tuples
                 print "extracting relations..."
                 tuples = extract_tuples(sentences, relation_group, threshold)
                 if len(tuples) > 0:
                     # remove dup
                     for t in tuples:
-                        if t in visited_tuples:
+                        hashing_key = tup[0][0]+","tup[0][1]+";"+tup[1][0]+","+tup[1][1]
+                        if hashing_key in visited_tuples:
                             continue
-                        visited_tuples.add(t)
+                        visited_tuples.add(hashing_key)
                         tuple_list.append(t)
 
         # sort to generate new query
         tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
-        print tuple_list
+        # print tuple_list
         found_a_new_query = True
         for tup in tuple_list:
             potential_query = tup[0][0] + " " + tup[1][0]
