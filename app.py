@@ -175,7 +175,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                 if len(tuples) > 0:
                     # remove dup
                     for t in tuples:
-                        hashing_key = tup[0][0]+","tup[0][1]+";"+tup[1][0]+","+tup[1][1]
+                        hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
                         if hashing_key in visited_tuples:
                             continue
                         visited_tuples.add(hashing_key)
