@@ -174,23 +174,20 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                         continue
                     visited_tuples.add(t)
                     tuple_list.append(t)
-            # sort to generate new query
-            tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
-            found_a_new_query = True
-            for tup in tuple_list:
-                potential_query = tup[0][0] + " " + tup[1][0]
-                if potential_query not in visited_queries:
-                    query = potential_query
-                    found_a_new_query = True
-                    break
-                else:
-                    found_a_new_query = False
-            if not found_a_new_query:
-                print "Cannot find >=k results with q and k for t. Exit."
-            #else: # for testing
-            #    print "new query is: ", query
-            #    break
-        # break # for testing
+                    
+        # sort to generate new query
+        tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
+        found_a_new_query = True
+        for tup in tuple_list:
+            potential_query = tup[0][0] + " " + tup[1][0]
+            if potential_query not in visited_queries:
+                query = potential_query
+                found_a_new_query = True
+                break
+            else:
+                found_a_new_query = False
+        if not found_a_new_query:
+            print "Cannot find >=k results with q and k for t. Exit."
 
     relation_print_format(tuple_list, relation_group)
 
