@@ -14,15 +14,15 @@ GOOGLE_ENGINE_ID = "018258045116810257593:z1fmkqqt_di"
 STANFORD_PATH = '../stanford-corenlp-full-2017-06-09'
 client = NLPCoreClient(STANFORD_PATH)
 properties_pipeline1 = {
-	"annotators": "tokenize,ssplit,pos,lemma,ner",
-	"parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
-	"ner.useSUTime": "0"
-	}
+    "annotators": "tokenize,ssplit,pos,lemma,ner",
+    "parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
+    "ner.useSUTime": "0"
+    }
 properties_pipeline2 = {
-	"annotators": "tokenize,ssplit,pos,lemma,ner,parse",
-	"parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
-	"ner.useSUTime": "0"
-	}
+    "annotators": "tokenize,ssplit,pos,lemma,ner,parse",
+    "parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
+    "ner.useSUTime": "0"
+    }
 
 groups = ['Live_In', 'Located_In', 'OrgBased_In', 'Work_For']
 
@@ -141,7 +141,7 @@ def relation_print_format(result_tuples, relation_type):
 
 
 def main(api_key, engine_id, relation_id, threshold, query, k):
-    print 'query: ', query
+
     relation_group = groups[relation_id-1]
     print 'ralations type: ', relation_group
 
@@ -151,32 +151,33 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
     tuple_list = []
     while len(tuple_list) < k:
         # Google CSE
+        print 'query: ', query
         print "fetching urls form Google CSE..."
         URLs = search_google(api_key, engine_id, query)
         visited_queries.add(query)
 
         for url in URLs:
-            if url in visited_urls:
-                continue
-            visited_urls.add(url)
-            # a. retreive webpage b. extract plain text
-            plain_text = get_plain_text(url)
-            # c. annotate
-            print "parsing passage..."
-            sentences = get_sentences(plain_text)
-            # analyze sentences to extract tuples
-            print "extracting relations..."
-            tuples = extract_tuples(sentences, relation_group, threshold)
-            if len(tuples) > 0:
-                # remove dup
-                for t in tuples:
-                    if t in visited_tuples:
-                        continue
-                    visited_tuples.add(t)
-                    tuple_list.append(t)
-                    
+            if url not in visited_urls:
+                visited_urls.add(url)
+                # a. retreive webpage b. extract plain text
+                plain_text = get_plain_text(url)
+                # c. annotate
+                print "parsing passage..."
+                sentences = get_sentences(plain_text)
+                # analyze sentences to extract tuples
+                print "extracting relations..."
+                tuples = extract_tuples(sentences, relation_group, threshold)
+                if len(tuples) > 0:
+                    # remove dup
+                    for t in tuples:
+                        if t in visited_tuples:
+                            continue
+                        visited_tuples.add(t)
+                        tuple_list.append(t)
+
         # sort to generate new query
         tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
+        print tuple_list
         found_a_new_query = True
         for tup in tuple_list:
             potential_query = tup[0][0] + " " + tup[1][0]
