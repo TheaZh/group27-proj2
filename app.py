@@ -152,51 +152,55 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
     visited_queries = set()
     tuple_list = []
     while len(tuple_list) < k:
-        # Google CSE
-        print 'query: ', query
-        print "fetching urls form Google CSE..."
-        URLs = search_google(api_key, engine_id, query)
-        visited_queries.add(query)
+        try:
+            # Google CSE
+            print 'query: ', query
+            print "fetching urls form Google CSE..."
+            URLs = search_google(api_key, engine_id, query)
+            visited_queries.add(query)
 
-        for url in URLs:
-            if url not in visited_urls:
-                print url
-                visited_urls.add(url)
-                # a. retreive webpage b. extract plain text
-                plain_text = get_plain_text(url)
-                # print plain_text
-                # c. annotate
-                print "parsing passage..."
-                sentences = get_sentences(plain_text)
-                # print sentences
-                # analyze sentences to extract tuples
-                print "extracting relations..."
-                tuples = extract_tuples(sentences, relation_group, threshold)
-                if len(tuples) > 0:
-                    # remove dup
-                    for t in tuples:
-                        hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
-                        if hashing_key in visited_tuples:
-                            continue
-                        visited_tuples.add(hashing_key)
-                        tuple_list.append(t)
+            for url in URLs:
+                if url not in visited_urls:
+                    print url
+                    visited_urls.add(url)
+                    # a. retreive webpage b. extract plain text
+                    plain_text = get_plain_text(url)
+                    # print plain_text
+                    # c. annotate
+                    print "parsing passage..."
+                    sentences = get_sentences(plain_text)
+                    # print sentences
+                    # analyze sentences to extract tuples
+                    print "extracting relations..."
+                    tuples = extract_tuples(sentences, relation_group, threshold)
+                    if len(tuples) > 0:
+                        # remove dup
+                        for t in tuples:
+                            hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
+                            if hashing_key in visited_tuples:
+                                continue
+                            visited_tuples.add(hashing_key)
+                            tuple_list.append(t)
 
-        # sort to generate new query
-        tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
-        # print tuple_list
-        found_a_new_query = True
-        for tup in tuple_list:
-            potential_query = tup[0][0] + " " + tup[1][0]
-            if potential_query not in visited_queries:
-                query = potential_query
-                found_a_new_query = True
+            # sort to generate new query
+            tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
+            # print tuple_list
+            found_a_new_query = True
+            for tup in tuple_list:
+                potential_query = tup[0][0] + " " + tup[1][0]
+                if potential_query not in visited_queries:
+                    query = potential_query
+                    found_a_new_query = True
+                    break
+                else:
+                    found_a_new_query = False
+            if not found_a_new_query:
+                print "Cannot find >=k results with q and k for t. Exit."
                 break
-            else:
-                found_a_new_query = False
-        if not found_a_new_query:
-            print "Cannot find >=k results with q and k for t. Exit."
+        except:
+            print "---------While Loop Error-----------"
 
-    relation_print_format(tuple_list, relation_group)
+        relation_print_format(tuple_list, relation_group)
 
     print 'End of story......................................................'
     sys.exit(0)
@@ -217,6 +221,18 @@ if __name__ == '__main__':
         extract_tuples(sentences, "Work_For", 0.2)
         sys.exit(0)
 
+    if len(sys.argv) >= 0 and len(sys.argv) < 7:
+        print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
+            "<google api key> is your Google Custom Search API Key\n", \
+            "<google engine id> is your Google Custom Search Engine ID\n", \
+            "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
+            "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
+            "which is the minimum extraction confidence that we request for the tuples in the output\n" \
+            "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
+            "a plausible tuple for the relation to extract \n" \
+            "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
+        sys.exit()
+
     if len(sys.argv) > 1:
         api_key = sys.argv[1]
         engine_id = sys.argv[2]
@@ -224,6 +240,23 @@ if __name__ == '__main__':
         t = float(sys.argv[4])
         q = sys.argv[5]
         k = sys.argv[6]
+
+    relation_group = groups[r - 1]
+
+    ##################################
+    #    Print Format - Parameters
+    ##################################
+    print 'Parameters:\n' \
+          'Client key      = ', GOOGLE_API, '\n'\
+          'Engine key      = ', GOOGLE_ENGINE_ID, '\n'\
+          'Relation        = ', relation_group, '\n'\
+          'Threshold       = ', t, '\n' \
+          'Query           = ', q, '\n'\
+          '# of Tuples     = ', k
+    ###################################
+    #    End of Printing Parameters
+    ###################################
+
 
     main(api_key, engine_id, r, t, q, k)
 
@@ -271,7 +304,7 @@ if __name__ == '__main__':
     result_tuples = sorted(result_tuples, key=lambda x: -float(x[2]))
 
 
-    '''
+
 
     #############################################
     #               Debug
@@ -285,23 +318,6 @@ if __name__ == '__main__':
 
     relation_group = groups[relation_id-1]
     number_of_tuples = 10
-
-
-
-        ##################################
-        #    Print Format - Parameters
-        ##################################
-    print 'Parameters:\n' \
-          'Client key      = ', GOOGLE_API, '\n'\
-          'Engine key      = ', GOOGLE_ENGINE_ID, '\n'\
-          'Relation        = ', relation_group, '\n'\
-          'Threshold       = ', threshold, '\n' \
-          'Query           = ', query, '\n'\
-          '# of Tuples     = ', number_of_tuples
-
-        ###################################
-        #    End of Printing Parameters
-        ###################################
 
     # get 10 urls
     # URLs = search_google(GOOGLE_API, GOOGLE_ENGINE_ID, query)
@@ -338,3 +354,5 @@ if __name__ == '__main__':
     #############################################
     #             End of Debug
     #############################################
+
+    '''
