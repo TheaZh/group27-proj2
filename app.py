@@ -101,7 +101,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
     try:
         for sentence in query_sentences:
             print " --- ", sentence
-            doc = client.annotate(text=[sentence], properties=properties_pipeline2)
+            doc = client.annotate(text=[sentence.encode('utf-8')], properties=properties_pipeline2)
             relations = doc.sentences[0].relations
             if len(relations) is 0:
                 continue
@@ -132,7 +132,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
                         print '============== END OF RELATION DESC =============='
 
                         # save tuples whose confidence above threshold
-                        print "confidence is : ", confidence
+                        # print "confidence is : ", confidence
                         if confidence >= threshold:
                             tup = []
                             tup.append((word1, type1))
@@ -143,11 +143,13 @@ def extract_tuples(query_sentences, relation_group, threshold):
                             # print tup
             except:
                 print '---------- Relation Error ----------'
+                raise
         print 'Relations extracted from this website: ' , num_of_valid_relations , ' (Overall: ' , num_of_relations , ')'
         # print tuples
         return tuples
     except:
-        print '---------- Sentence Error ----------'
+        print '-------- Sentence Error ----------'
+        raise
 
 
 def relation_print_format(result_tuples, relation_type):
