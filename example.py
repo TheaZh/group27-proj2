@@ -1,21 +1,21 @@
 from NLPCore import NLPCoreClient
 
-text = ["Bill Gates ."]
+text = ["While at Harvard , Gates developed a version of the programming language BASIC for the first microcomputer -- the MITS Altair ."]
 
 #path to corenlp
 STANFORD_PATH = '../stanford-corenlp-full-2017-06-09'
 client = NLPCoreClient(STANFORD_PATH)
 properties = {
-	"annotators": "tokenize,ssplit,pos,lemma,ner,parse,relation",
+	"annotators": "tokenize,ssplit,pos,lemma,ner",
 	"parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
 	"ner.useSUTime": "0"
 	}
 doc = client.annotate(text=text, properties=properties)
 # print doc.sentences[0].entities[0].type, ': ', doc.sentences[0].entities[0].value
 # print doc.sentences[0].entities[1].type, ': ', doc.sentences[0].entities[1].value
-print doc.sentences[0].relations
-if len(doc.sentences[0].relations) is 0:
-	print 'none'
+# print doc.sentences[0].relations
+# if len(doc.sentences[0].relations) is 0:
+# 	print 'none'
 
 # print '======='
 # print doc.sentences[1].entities[0].type, ': ', doc.sentences[1].entities[0].value
@@ -33,7 +33,7 @@ print '--------------------------------'
 
 # print '--------------------------------'
 # print '--------------------------------'
-# print(doc.tree_as_string())
+print(doc.tree_as_string())
 # newsentence = ""
 # for x in doc.sentences[0].tokens:
 # 	newsentence += " " + x.word
