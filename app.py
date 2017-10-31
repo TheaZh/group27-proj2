@@ -85,7 +85,7 @@ def get_sentences(plain_txt, relation_group):
         if is_filtered_by_entity_type(sentence, relation_group):
             continue
         newsentence = from_words_to_sentence(sentence)
-        print "----" + newsentence
+        # print "----" + newsentence
         # newsentence = newsentence.encode('utf8','replace')
         sentences.append(newsentence)
     # print 'sentences: ', sentences
@@ -100,7 +100,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
 
     try:
         for sentence in query_sentences:
-            # print " --- ", sentence
+            print " --- ", sentence
             doc = client.annotate(text=[sentence], properties=properties_pipeline2)
             relations = doc.sentences[0].relations
             if len(relations) is 0:
@@ -202,6 +202,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                         # analyze sentences to extract tuples
                         # print "extracting relations..."
                         tuples = extract_tuples(sentences, relation_group, threshold)
+                        if not tuples:
+                            continue
                         if len(tuples) > 0:
                             # remove dup
                             for t in tuples:
