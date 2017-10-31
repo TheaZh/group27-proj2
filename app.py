@@ -216,8 +216,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                                 visited_tuples.add(hashing_key)
                                 tuple_list.append(t)
                     except:
-                        raise
                         print "timeout, continue to next url..."
+                        raise
 
 
             # sort to generate new query
@@ -235,8 +235,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                 print "Cannot find >=k results with q and k for t. Exit."
                 break
         except:
-            raise
             print "---------While Loop Error-----------"
+            raise
 
 
     print 'End of story......................................................'
