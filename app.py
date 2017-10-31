@@ -38,9 +38,6 @@ def search_google(google_api, google_engine_id, query):
     res = service.cse().list(q=query, cx=google_engine_id, ).execute()
     URLs = []
     for item in res['items']:
-        # print item
-        # print "URL: ", item['link']
-        # append url into url list
         URLs.append(item['link'])
         #print item,"\n"
     return URLs
@@ -51,18 +48,12 @@ def get_plain_text(url):
     html_doc = response.read() # get html doc
     soup = BeautifulSoup(html_doc,'html.parser')
     # kill all script and style elements
-    for script in soup(["script", "style"]):
+    for script in soup(["script", "style", "sup"]):
         script.decompose()  # rip it out
-
-    # get text
-    text = soup.get_text()
     text = ''
     # for string in soup.stripped_strings:
     for string in soup.find_all('p'):
         text = text + ' ' + string.get_text()
-    # text = text.encode()
-    # print 'text: ', text
-    # return as an array format
     return [text.encode('utf-8')]
 
 # get a whole sentence
@@ -86,14 +77,17 @@ def get_sentences(plain_txt, relation_group):
     doc = client.annotate(text=plain_txt, properties=properties_pipeline1)
     sentences = []
 
+    # print doc.tree_as_string()
+
     for sentence in doc.sentences:
         # print "for this sentence: it contains: "
         # print sentence.__str__()
         if is_filtered_by_entity_type(sentence, relation_group):
             continue
         newsentence = from_words_to_sentence(sentence)
+        print "----" + newsentence
         # newsentence = newsentence.encode('utf8','replace')
-        sentences.append(newsentence.encode('utf-8'))
+        sentences.append(newsentence)
     # print 'sentences: ', sentences
     return sentences
 
@@ -106,7 +100,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
 
     try:
         for sentence in query_sentences:
-            print " --- ", sentence
+            # print " --- ", sentence
             doc = client.annotate(text=[sentence], properties=properties_pipeline2)
             relations = doc.sentences[0].relations
             if len(relations) is 0:
@@ -181,7 +175,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             print 'query: ', query
             print "fetching urls form Google CSE..."
             # URLs = search_google(api_key, engine_id, query)
-            URLs = ['https://news.microsoft.com/exec/bill-gates/',
+            URLs = [
             'https://en.wikipedia.org/wiki/Bill_Gates',
             'https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017',
             'https://www.biography.com/people/bill-gates-9307520',
