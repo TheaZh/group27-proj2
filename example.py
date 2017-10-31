@@ -1,21 +1,38 @@
+import re, sys
+from googleapiclient.discovery import build
+import urllib2
+from bs4 import BeautifulSoup
 from NLPCore import NLPCoreClient
+import decimal
 
-text = ["Bill Gates ."]
+def get_plain_text(url):
+    response = urllib2.urlopen(url)
+    html_doc = response.read() # get html doc
+    soup = BeautifulSoup(html_doc,'html.parser')
+    for script in soup(["script", "style", "sup"]):
+        script.decompose()  # rip it out
+    text = ''
+    for string in soup.find_all('p'):
+        text = text + ' ' + string.get_text()
+    return [text.encode('utf-8')]
 
+
+
+text = get_plain_text('https://en.wikipedia.org/wiki/Bill_Gates')
 #path to corenlp
 STANFORD_PATH = '../stanford-corenlp-full-2017-06-09'
 client = NLPCoreClient(STANFORD_PATH)
 properties = {
-	"annotators": "tokenize,ssplit,pos,lemma,ner,parse,relation",
+	"annotators": "tokenize,ssplit,pos,lemma,ner",
 	"parse.model": "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",
 	"ner.useSUTime": "0"
 	}
 doc = client.annotate(text=text, properties=properties)
 # print doc.sentences[0].entities[0].type, ': ', doc.sentences[0].entities[0].value
 # print doc.sentences[0].entities[1].type, ': ', doc.sentences[0].entities[1].value
-print doc.sentences[0].relations
-if len(doc.sentences[0].relations) is 0:
-	print 'none'
+# print doc.sentences[0].relations
+# if len(doc.sentences[0].relations) is 0:
+# 	print 'none'
 
 # print '======='
 # print doc.sentences[1].entities[0].type, ': ', doc.sentences[1].entities[0].value
@@ -26,6 +43,22 @@ if len(doc.sentences[0].relations) is 0:
 
 print '--------------------------------'
 print '--------------------------------'
+
+def from_words_to_sentence(sentence):
+    newsentence = ""
+    for x in sentence.tokens:
+        newsentence += " " + x.word
+    return newsentence
+sentences = []
+for sentence in doc.sentences:
+	newsentence = from_words_to_sentence(sentence)
+	sentences.append(newsentence)
+	print '--', newsentence
+	# print newsentence
+
+for s in sentences:
+	print s
+
 # confidence_dic = doc.sentences[0].relations[0].probabilities
 # for key in confidence_dic.iterkeys():
 # 	print key

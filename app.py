@@ -30,7 +30,7 @@ type_dict = dict()
 type_dict['Live_In'] = ['PERSON', 'LOCATION']
 type_dict['Located_In'] = ['LOCATION']
 type_dict['OrgBased_In'] = ['ORGANIZATION', 'LOCATION']
-type_dict['Work_For'] = ['PERSON', 'ORGANIZATION']
+type_dict['Work_For'] = ['ORGANIZATION','PERSON']
 
 # get URLs list
 def search_google(google_api, google_engine_id, query):
@@ -38,9 +38,6 @@ def search_google(google_api, google_engine_id, query):
     res = service.cse().list(q=query, cx=google_engine_id, ).execute()
     URLs = []
     for item in res['items']:
-        # print item
-        # print "URL: ", item['link']
-        # append url into url list
         URLs.append(item['link'])
         #print item,"\n"
     return URLs
@@ -51,17 +48,12 @@ def get_plain_text(url):
     html_doc = response.read() # get html doc
     soup = BeautifulSoup(html_doc,'html.parser')
     # kill all script and style elements
-    for script in soup(["script", "style"]):
+    for script in soup(["script", "style", "sup"]):
         script.decompose()  # rip it out
-
-    # get text
-    text = soup.get_text()
     text = ''
-    for string in soup.stripped_strings:
-        text = text + ' ' + string
-    # text = text.encode()
-    # print 'text: ', text
-    # return as an array format
+    # for string in soup.stripped_strings:
+    for string in soup.find_all('p'):
+        text = text + ' ' + string.get_text()
     return [text.encode('utf-8')]
 
 # get a whole sentence
@@ -85,14 +77,17 @@ def get_sentences(plain_txt, relation_group):
     doc = client.annotate(text=plain_txt, properties=properties_pipeline1)
     sentences = []
 
+    # print doc.tree_as_string()
+
     for sentence in doc.sentences:
         # print "for this sentence: it contains: "
         # print sentence.__str__()
         if is_filtered_by_entity_type(sentence, relation_group):
             continue
         newsentence = from_words_to_sentence(sentence)
+        # print "----" + newsentence
         # newsentence = newsentence.encode('utf8','replace')
-        sentences.append(newsentence.encode('utf-8'))
+        sentences.append(newsentence)
     # print 'sentences: ', sentences
     return sentences
 
@@ -102,30 +97,36 @@ def extract_tuples(query_sentences, relation_group, threshold):
     num_of_relations = 0  # the overall number of relations extracted from this website
     num_of_valid_relations = 0 # the number of valid relations (including relations whose confidence below threshold)
     tuples = []
+    type_set = type_dict[relation_group]
+    valid_type1 = 'PEOPLE' if type_set[0] is 'PERSON' else type_set[0]
+    valid_type2 = 'PEOPLE' if type_set[1] is 'PERSON' else type_set[1]
+    # print 'valid types: ', valid_type1, '--', valid_type2
 
     try:
         for sentence in query_sentences:
             # print " --- ", sentence
-            doc = client.annotate(text=[sentence], properties=properties_pipeline2)
+            doc = client.annotate(text=[sentence.encode('utf-8')], properties=properties_pipeline2)
             relations = doc.sentences[0].relations
             if len(relations) is 0:
                 continue
             try:
                 for relation in relations:
                     if not relation:
-                        # print 'len 0'
                         continue
-                    num_of_relations += 1 # count relations
                     # print "Relation:::::::", relation, "\ntype:::::", relation.probabilities.keys()[0]
                     probability_dic = sorted(relation.probabilities.items(), key=lambda (k, v) : -float(v))
+                    if probability_dic[0][0] != '_NR':
+                        num_of_relations += 1  # count relations
                     if probability_dic[0][0] == relation_group:
-                        num_of_valid_relations += 1 # count valid relations
                         word1 = relation.entities[0].value
                         type1 = relation.entities[0].type
                         word2 = relation.entities[1].value
                         type2 = relation.entities[1].type
                         confidence = float(relation.probabilities[relation_group])
-
+                        # print "type::::", type1, "--", type2
+                        if type1 != valid_type1 or type2 != valid_type2:
+                            continue
+                        num_of_valid_relations += 1  # count valid relations
                         print '============== EXTRACTED RELATION =============='
                         print 'Sentence:' , sentence
                         print 'Relation Type:', relation_group, ' | ' \
@@ -137,33 +138,42 @@ def extract_tuples(query_sentences, relation_group, threshold):
                         print '============== END OF RELATION DESC =============='
 
                         # save tuples whose confidence above threshold
-                        print "confidence is : ", confidence
+                        # print "confidence is : ", confidence
                         if confidence >= threshold:
                             tup = []
                             tup.append((word1, type1))
                             tup.append((word2, type2))
                             tup.append(round(confidence,3))
                             tuples.append(tup)
-                            # print 'here is one tuple: the tuple looks like this:'
-                            # print tup
+                            print 'here is one tuple: the tuple looks like this:'
+                            print tup
             except:
                 print '---------- Relation Error ----------'
+                raise
         print 'Relations extracted from this website: ' , num_of_valid_relations , ' (Overall: ' , num_of_relations , ')'
         # print tuples
         return tuples
     except:
-        print '---------- Sentence Error ----------'
+        print '-------- Sentence Error ----------'
+        raise
 
 
-def relation_print_format(result_tuples, relation_type):
+# result_tuples is a dic
+# key is (entity1 entity2) 
+# value is confidence
+def relation_print_format(sorted_tuple_list, relation_type):
     print 'Pruning relations below threshold...\n' \
-          'Number of tuples after pruning: ' , len(result_tuples) , '\n' \
+          'Number of tuples after pruning: ' , len(sorted_tuple_list) , '\n' \
           '================== ALL RELATIONS ================='
-    for t in result_tuples:
+    type_set = type_dict[relation_type]
+    for tuple in sorted_tuple_list:
         # now tuple looks like: [('Gates', 'PEOPLE'), ('Microsoft', 'ORGANIZATION'), 0.379]
-        entity1 = str(t[0][0]+' ('+t[0][1]+')').ljust(37)
-        entity2 = str(t[1][0]+' ('+t[1][1]+')')
-        print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20), str(decimal.Decimal("%.3f" % float(t[2]))).ljust(10), entity1, entity2)
+        # key looks like : (Gates Microsoft)
+        # value is 0.379
+        tuple_set = tuple[0].split(' ')
+        entity1 = str(tuple_set[0] +' ('+('PEOPLE' if type_set[0] is 'PERSON' else type_set[0])+')').ljust(37)
+        entity2 = str(tuple_set[1] +' ('+('PEOPLE' if type_set[1] is 'PERSON' else type_set[1])+')')
+        print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20), str(decimal.Decimal("%.3f" % float(tuple[1]))).ljust(10), entity1, entity2)
 
 
 def main(api_key, engine_id, relation_id, threshold, query, k):
@@ -173,8 +183,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
     visited_tuples = set()
     visited_urls = set()
     visited_queries = set()
-    tuple_list = []
-    while len(tuple_list) < k:
+    tuple_dict = dict()
+    while len(tuple_dict) < k:
         try:
             # Google CSE
             print 'query: ', query
@@ -199,6 +209,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                     # a. retreive webpage b. extract plain text
                     try:
                         plain_text = get_plain_text(url)
+                        # plain_text = ['William Henry Gates III -LRB- born October 28 , 1955 -RRB- is an American business magnate , investor , author , philanthropist , and co-founder of the Microsoft Corporation along with Paul Allen .']
                         # print plain_text
                         # c. annotate
                         # print "parsing passage..."
@@ -207,25 +218,36 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                         # analyze sentences to extract tuples
                         # print "extracting relations..."
                         tuples = extract_tuples(sentences, relation_group, threshold)
+                        if not tuples:
+                            continue
                         if len(tuples) > 0:
                             # remove dup
+                            # tup -----  [('Gates', 'PEOPLE'), ('Microsoft', 'ORGANIZATION'), 0.379]
                             for t in tuples:
-                                hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
+                                # hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
+                                hashing_key = t[0][0] + ' ' + t[1][0]
                                 if hashing_key in visited_tuples:
+                                    tuple_dict[hashing_key] = max(tuple_dict[hashing_key], float(t[2]))
                                     continue
                                 visited_tuples.add(hashing_key)
-                                tuple_list.append(t)
+                                tuple_dict[hashing_key] = float(t[2])
                     except:
-                        raise
                         print "timeout, continue to next url..."
+                        raise
 
 
             # sort to generate new query
-            tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
-            # print tuple_list
+            print tuple_dict
+            sorted_tuple_list = sorted(tuple_dict.items(), key=lambda (k, v): -v)
+            # looks like [('Corporation Allen', 0.268), ('Allen Corporation', 0.26)]
+            print sorted_tuple_list
+
+            relation_print_format(sorted_tuple_list,relation_group)
+
             found_a_new_query = False
-            for tup in tuple_list:
-                potential_query = tup[0][0] + " " + tup[1][0]
+            for tup in sorted_tuple_list:
+                # potential_query = tup[0][0] + " " + tup[1][0]
+                potential_query = tup[0]
                 if potential_query not in visited_queries:
                     query = potential_query
                     found_a_new_query = True
@@ -235,8 +257,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                 print "Cannot find >=k results with q and k for t. Exit."
                 break
         except:
-            raise
             print "---------While Loop Error-----------"
+            raise
 
 
     print 'End of story......................................................'
@@ -251,28 +273,28 @@ if __name__ == '__main__':
     q = "bill gates microsoft"
     k = 2
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'test':
-        main(api_key, engine_id, r, t, q, k)
-
-    if len(sys.argv) >= 0 and len(sys.argv) < 7:
-        print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
-            "<google api key> is your Google Custom Search API Key\n", \
-            "<google engine id> is your Google Custom Search Engine ID\n", \
-            "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
-            "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
-            "which is the minimum extraction confidence that we request for the tuples in the output\n" \
-            "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
-            "a plausible tuple for the relation to extract \n" \
-            "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
-        sys.exit()
-
-    if len(sys.argv) > 1:
-        api_key = sys.argv[1]
-        engine_id = sys.argv[2]
-        r = int(sys.argv[3])
-        t = float(sys.argv[4])
-        q = sys.argv[5]
-        k = sys.argv[6]
+    # if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    #     main(api_key, engine_id, r, t, q, k)
+    #
+    # if len(sys.argv) >= 0 and len(sys.argv) < 7:
+    #     print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
+    #         "<google api key> is your Google Custom Search API Key\n", \
+    #         "<google engine id> is your Google Custom Search Engine ID\n", \
+    #         "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
+    #         "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
+    #         "which is the minimum extraction confidence that we request for the tuples in the output\n" \
+    #         "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
+    #         "a plausible tuple for the relation to extract \n" \
+    #         "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
+    #     sys.exit()
+    #
+    # if len(sys.argv) > 1:
+    #     api_key = sys.argv[1]
+    #     engine_id = sys.argv[2]
+    #     r = int(sys.argv[3])
+    #     t = float(sys.argv[4])
+    #     q = sys.argv[5]
+    #     k = sys.argv[6]
 
     relation_group = groups[r - 1]
 
