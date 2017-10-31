@@ -57,8 +57,9 @@ def get_plain_text(url):
     # get text
     text = soup.get_text()
     text = ''
-    for string in soup.stripped_strings:
-        text = text + ' ' + string
+    # for string in soup.stripped_strings:
+    for string in soup.find_all('p'):
+        text = text + ' ' + string.get_text()
     # text = text.encode()
     # print 'text: ', text
     # return as an array format
@@ -105,7 +106,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
 
     try:
         for sentence in query_sentences:
-            # print " --- ", sentence
+            print " --- ", sentence
             doc = client.annotate(text=[sentence], properties=properties_pipeline2)
             relations = doc.sentences[0].relations
             if len(relations) is 0:
@@ -251,28 +252,28 @@ if __name__ == '__main__':
     q = "bill gates microsoft"
     k = 2
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'test':
-        main(api_key, engine_id, r, t, q, k)
-
-    if len(sys.argv) >= 0 and len(sys.argv) < 7:
-        print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
-            "<google api key> is your Google Custom Search API Key\n", \
-            "<google engine id> is your Google Custom Search Engine ID\n", \
-            "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
-            "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
-            "which is the minimum extraction confidence that we request for the tuples in the output\n" \
-            "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
-            "a plausible tuple for the relation to extract \n" \
-            "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
-        sys.exit()
-
-    if len(sys.argv) > 1:
-        api_key = sys.argv[1]
-        engine_id = sys.argv[2]
-        r = int(sys.argv[3])
-        t = float(sys.argv[4])
-        q = sys.argv[5]
-        k = sys.argv[6]
+    # if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    #     main(api_key, engine_id, r, t, q, k)
+    #
+    # if len(sys.argv) >= 0 and len(sys.argv) < 7:
+    #     print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
+    #         "<google api key> is your Google Custom Search API Key\n", \
+    #         "<google engine id> is your Google Custom Search Engine ID\n", \
+    #         "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
+    #         "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
+    #         "which is the minimum extraction confidence that we request for the tuples in the output\n" \
+    #         "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
+    #         "a plausible tuple for the relation to extract \n" \
+    #         "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
+    #     sys.exit()
+    #
+    # if len(sys.argv) > 1:
+    #     api_key = sys.argv[1]
+    #     engine_id = sys.argv[2]
+    #     r = int(sys.argv[3])
+    #     t = float(sys.argv[4])
+    #     q = sys.argv[5]
+    #     k = sys.argv[6]
 
     relation_group = groups[r - 1]
 
