@@ -215,11 +215,7 @@ if __name__ == '__main__':
     k = 2
 
     if len(sys.argv) > 1 and sys.argv[1] == 'test':
-        text = ["In June 2006, Gates announced that he would be transitioning from full-time work at Microsoft to part-time work and full-time work at the Bill & Melinda Gates Foundation".encode('utf-8')]
-        sentences = get_sentences(text)
-        print sentences
-        extract_tuples(sentences, "Work_For", 0.2)
-        sys.exit(0)
+        main(api_key, engine_id, r, t, q, k)
 
     if len(sys.argv) >= 0 and len(sys.argv) < 7:
         print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
