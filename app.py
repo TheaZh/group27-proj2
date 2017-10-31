@@ -26,6 +26,12 @@ properties_pipeline2 = {
 
 groups = ['Live_In', 'Located_In', 'OrgBased_In', 'Work_For']
 
+type_dict = dict()
+type_dict['Live_In'] = ['PERSON', 'LOCATION']
+type_dict['Located_In'] = ['LOCATION']
+type_dict['OrgBased_In'] = ['ORGANIZATION', 'LOCATION']
+type_dict['Work_For'] = ['PERSON', 'ORGANIZATION']
+
 # get URLs list
 def search_google(google_api, google_engine_id, query):
     service = build("customsearch", "v1", developerKey=google_api)
@@ -65,11 +71,25 @@ def from_words_to_sentence(sentence):
         newsentence += " " + x.word
     return newsentence
 
+def is_filtered_by_entity_type(sentence, relation_group):
+    entity_type_set = set()
+    for token in sentence.tokens:
+        entity_type_set.add(str(token.ner))
+    for entity_type in type_dict[relation_group]:
+        if entity_type not in entity_type_set:
+            return True
+    return False
+
 # get sentences from plain text
-def get_sentences(plain_txt):
+def get_sentences(plain_txt, relation_group):
     doc = client.annotate(text=plain_txt, properties=properties_pipeline1)
     sentences = []
+
     for sentence in doc.sentences:
+        # print "for this sentence: it contains: "
+        # print sentence.__str__()
+        if is_filtered_by_entity_type(sentence, relation_group):
+            continue
         newsentence = from_words_to_sentence(sentence)
         # newsentence = newsentence.encode('utf8','replace')
         sentences.append(newsentence.encode('utf-8'))
@@ -78,13 +98,14 @@ def get_sentences(plain_txt):
 
 # analyze sentences to extract tuples
 def extract_tuples(query_sentences, relation_group, threshold):
+    # return [] # test
     num_of_relations = 0  # the overall number of relations extracted from this website
     num_of_valid_relations = 0 # the number of valid relations (including relations whose confidence below threshold)
     tuples = []
 
     try:
         for sentence in query_sentences:
-            print " --- ", sentence
+            # print " --- ", sentence
             doc = client.annotate(text=[sentence], properties=properties_pipeline2)
             relations = doc.sentences[0].relations
             if len(relations) is 0:
@@ -123,12 +144,12 @@ def extract_tuples(query_sentences, relation_group, threshold):
                             tup.append((word2, type2))
                             tup.append(round(confidence,3))
                             tuples.append(tup)
-                            print 'here is one tuple: the tuple looks like this:'
-                            print tup
+                            # print 'here is one tuple: the tuple looks like this:'
+                            # print tup
             except:
                 print '---------- Relation Error ----------'
         print 'Relations extracted from this website: ' , num_of_valid_relations , ' (Overall: ' , num_of_relations , ')'
-        print tuples
+        # print tuples
         return tuples
     except:
         print '---------- Sentence Error ----------'
@@ -138,14 +159,16 @@ def relation_print_format(result_tuples, relation_type):
     print 'Pruning relations below threshold...\n' \
           'Number of tuples after pruning: ' , len(result_tuples) , '\n' \
           '================== ALL RELATIONS ================='
-    for tuple in result_tuples:
-        print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20), str(decimal.Decimal("%.3f" % float(tuple[2]))).ljust(10), tuple[0].ljust(37), tuple[1])
+    for t in result_tuples:
+        # now tuple looks like: [('Gates', 'PEOPLE'), ('Microsoft', 'ORGANIZATION'), 0.379]
+        entity1 = str(t[0][0]+' ('+t[0][1]+')').ljust(37)
+        entity2 = str(t[1][0]+' ('+t[1][1]+')')
+        print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20), str(decimal.Decimal("%.3f" % float(t[2]))).ljust(10), entity1, entity2)
 
 
 def main(api_key, engine_id, relation_id, threshold, query, k):
 
     relation_group = groups[relation_id-1]
-    print 'ralations type: ', relation_group
 
     visited_tuples = set()
     visited_urls = set()
@@ -156,51 +179,65 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             # Google CSE
             print 'query: ', query
             print "fetching urls form Google CSE..."
-            URLs = search_google(api_key, engine_id, query)
+            # URLs = search_google(api_key, engine_id, query)
+            URLs = ['https://news.microsoft.com/exec/bill-gates/',
+            'https://en.wikipedia.org/wiki/Bill_Gates',
+            'https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017',
+            'https://www.biography.com/people/bill-gates-9307520',
+            'http://www.telegraph.co.uk/technology/0/bill-gates/',
+            'https://www.cnbc.com/2017/09/25/bill-gates-microsoft-ceo-satya-nadella-talk-about-leadership.html',
+            'https://twitter.com/billgates',
+            'https://www.wsj.com/articles/a-rare-joint-interview-with-microsoft-ceo-satya-nadella-and-bill-gates-1506358852',
+            'https://www.youtube.com/watch?v=rOqMawDj0LQ',
+            'https://qz.com/1054323/bill-gates-will-have-no-microsoft-msft-shares-by-mid-2019-at-his-current-rate/']
             visited_queries.add(query)
 
             for url in URLs:
                 if url not in visited_urls:
-                    print url
+                    print "Processing: ", url
                     visited_urls.add(url)
                     # a. retreive webpage b. extract plain text
-                    plain_text = get_plain_text(url)
-                    # print plain_text
-                    # c. annotate
-                    print "parsing passage..."
-                    sentences = get_sentences(plain_text)
-                    # print sentences
-                    # analyze sentences to extract tuples
-                    print "extracting relations..."
-                    tuples = extract_tuples(sentences, relation_group, threshold)
-                    if len(tuples) > 0:
-                        # remove dup
-                        for t in tuples:
-                            hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
-                            if hashing_key in visited_tuples:
-                                continue
-                            visited_tuples.add(hashing_key)
-                            tuple_list.append(t)
+                    try:
+                        plain_text = get_plain_text(url)
+                        # print plain_text
+                        # c. annotate
+                        # print "parsing passage..."
+                        sentences = get_sentences(plain_text, relation_group)
+                        # print sentences
+                        # analyze sentences to extract tuples
+                        # print "extracting relations..."
+                        tuples = extract_tuples(sentences, relation_group, threshold)
+                        if len(tuples) > 0:
+                            # remove dup
+                            for t in tuples:
+                                hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
+                                if hashing_key in visited_tuples:
+                                    continue
+                                visited_tuples.add(hashing_key)
+                                tuple_list.append(t)
+                    except:
+                        raise
+                        print "timeout, continue to next url..."
+
 
             # sort to generate new query
             tuple_list = sorted(tuple_list, key=lambda x: -float(x[2]))
             # print tuple_list
-            found_a_new_query = True
+            found_a_new_query = False
             for tup in tuple_list:
                 potential_query = tup[0][0] + " " + tup[1][0]
                 if potential_query not in visited_queries:
                     query = potential_query
                     found_a_new_query = True
+                    # print "potential_query is :", potential_query
                     break
-                else:
-                    found_a_new_query = False
             if not found_a_new_query:
                 print "Cannot find >=k results with q and k for t. Exit."
                 break
         except:
+            raise
             print "---------While Loop Error-----------"
 
-        relation_print_format(tuple_list, relation_group)
 
     print 'End of story......................................................'
     sys.exit(0)
@@ -209,8 +246,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
 if __name__ == '__main__':
     api_key = GOOGLE_API
     engine_id = GOOGLE_ENGINE_ID
-    r = 4
-    t = 0.22
+    r = 4 # Work_For
+    t = 0.1
     q = "bill gates microsoft"
     k = 2
 
