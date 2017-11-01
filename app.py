@@ -54,8 +54,8 @@ def get_plain_text(url):
     for script in soup(["script", "style", "sup"]):
         script.decompose()  # rip it out
     text = ''
-    # for string in soup.stripped_strings:
-    for string in soup.find_all('p'):
+    for string in soup.stripped_strings:
+    # for string in soup.find_all('p'):
         text = text + ' ' + string.get_text()
     return [text.encode('utf-8')]
 
