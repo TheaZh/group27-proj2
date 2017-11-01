@@ -154,7 +154,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
                             # print "however we dont want it"
                             continue
                         num_of_valid_relations += 1  # count valid relations
-                        print '============== EXTRACTED RELATION =============='
+                        print '=============== EXTRACTED RELATION ==============='
                         print 'Sentence:' , sentence.replace("-LRB-", "(").replace("-RRB-",")")
                         print 'Relation Type:', relation_group, ' | ' \
                               'Confidence=', confidence, ' | ' \
@@ -210,11 +210,14 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
     visited_urls = set()
     visited_queries = set()
     tuple_dict = dict()
+    round = 0
     while len(tuple_dict) < k:
         try:
+            round = round + 1
             # Google CSE
             print 'query: ', query
             print "fetching urls form Google CSE..."
+            print "=========== Iteration: "+str(round)+" - Query: "+ query+" ==========="
             URLs = search_google(api_key, engine_id, query)
 
             # URLs = ['https://www.youtube.com/watch?v=rOqMawDj0LQ']
