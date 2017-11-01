@@ -34,6 +34,9 @@ Run
       Install git if you haven't
 
         sudo apt-get install git
+	
+      then, clone project
+      
         git clone https://github.com/TheaZh/group27-proj2.git
        
 3. Navigate to folder
