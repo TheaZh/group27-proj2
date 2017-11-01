@@ -91,6 +91,8 @@ def get_sentences(plain_txt, relation_group):
         if is_filtered_by_entity_type(sentence, relation_group):
             continue
         newsentence = from_words_to_sentence(sentence)
+        if len(newsentence) > 2000:
+            continue
         # print "----" + newsentence
         # newsentence = newsentence.encode('utf8','replace')
         sentences.append(newsentence)
@@ -144,9 +146,11 @@ def extract_tuples(query_sentences, relation_group, threshold):
                         type1 = relation.entities[0].type
                         word2 = relation.entities[1].value
                         type2 = relation.entities[1].type
+                        # print "we get a tuple: ", word1, type1, word2, type2
                         confidence = float(relation.probabilities[relation_group])
                         # print "type::::", type1, "--", type2
                         if type1 != valid_type1 or type2 != valid_type2:
+                            # print "however we dont want it"
                             continue
                         num_of_valid_relations += 1  # count valid relations
                         print '============== EXTRACTED RELATION =============='
@@ -212,18 +216,9 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             print 'query: ', query
             print "fetching urls form Google CSE..."
             URLs = search_google(api_key, engine_id, query)
-            """
-            URLs = ['https://news.microsoft.com/exec/bill-gates/',
-            'https://en.wikipedia.org/wiki/Bill_Gates',
-            'https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017',
-            'https://www.biography.com/people/bill-gates-9307520',
-            'http://www.telegraph.co.uk/technology/0/bill-gates/',
-            'https://www.cnbc.com/2017/09/25/bill-gates-microsoft-ceo-satya-nadella-talk-about-leadership.html',
-            'https://twitter.com/billgates',
-            'https://www.wsj.com/articles/a-rare-joint-interview-with-microsoft-ceo-satya-nadella-and-bill-gates-1506358852',
-            'https://www.youtube.com/watch?v=rOqMawDj0LQ',
-            'https://qz.com/1054323/bill-gates-will-have-no-microsoft-msft-shares-by-mid-2019-at-his-current-rate/']
-            """
+
+            # URLs = ['https://www.biography.com/people/bill-gates-9307520']
+
             visited_queries.add(query)
 
             for url in URLs:
