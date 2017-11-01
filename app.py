@@ -1,4 +1,4 @@
-import re, sys
+import os, sys
 from googleapiclient.discovery import build
 import urllib2
 from bs4 import BeautifulSoup
@@ -12,6 +12,7 @@ GOOGLE_API = "AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo"
 GOOGLE_ENGINE_ID = "018258045116810257593:z1fmkqqt_di"
 
 STANFORD_PATH = '../stanford-corenlp-full-2017-06-09'
+# STANFORD_PATH = os.path.abspath("stanford-corenlp-full-2017-06-09")
 client = NLPCoreClient(STANFORD_PATH)
 properties_pipeline1 = {
     "annotators": "tokenize,ssplit,pos,lemma,ner",
@@ -99,6 +100,8 @@ def get_sentences(plain_txt, relation_group):
 
 # check valid relation
 def is_valid_relation(type1, type2, relation_group):
+    if relation_group == "_NR":
+        return False
     type_set = type_dict[relation_group]
     valid_type1 = 'PEOPLE' if type_set[0] == 'PERSON' else type_set[0]
     if len(type_set) == 2:
