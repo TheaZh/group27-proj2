@@ -56,7 +56,7 @@ def get_plain_text(url):
     text = ''
     for string in soup.stripped_strings:
     # for string in soup.find_all('p'):
-        text = text + ' ' + string.get_text()
+        text = text + ' ' + string
     return [text.encode('utf-8')]
 
 
