@@ -211,7 +211,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             # Google CSE
             print 'query: ', query
             print "fetching urls form Google CSE..."
-            # URLs = search_google(api_key, engine_id, query)
+            URLs = search_google(api_key, engine_id, query)
+            """
             URLs = ['https://news.microsoft.com/exec/bill-gates/',
             'https://en.wikipedia.org/wiki/Bill_Gates',
             'https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017',
@@ -222,6 +223,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             'https://www.wsj.com/articles/a-rare-joint-interview-with-microsoft-ceo-satya-nadella-and-bill-gates-1506358852',
             'https://www.youtube.com/watch?v=rOqMawDj0LQ',
             'https://qz.com/1054323/bill-gates-will-have-no-microsoft-msft-shares-by-mid-2019-at-his-current-rate/']
+            """
             visited_queries.add(query)
 
             for url in URLs:
