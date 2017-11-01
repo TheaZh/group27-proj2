@@ -21,10 +21,14 @@ Run
 --------
 1. Install Java 8 and download Stanford CoreNLP software suite
 
-      Run under Ubuntu 16. LTS
+    Install Java 8
 
+      	#Run under Ubuntu 16.04 LTS
         sudo apt-get update
         sudo apt-get install default-jdk 
+	
+   Get Stanford CoreNLP
+   
         wget http://nlp.stanford.edu/software/stanford-corenlp-full-2017-06-09.zip
         sudo apt-get install unzip
         unzip stanford-corenlp-full-2017-06-09.zip        
