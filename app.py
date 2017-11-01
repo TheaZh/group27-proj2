@@ -211,7 +211,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             # Google CSE
             print 'query: ', query
             print "fetching urls form Google CSE..."
-            # URLs = search_google(api_key, engine_id, query)
+            URLs = search_google(api_key, engine_id, query)
+            """
             URLs = ['https://news.microsoft.com/exec/bill-gates/',
             'https://en.wikipedia.org/wiki/Bill_Gates',
             'https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017',
@@ -222,6 +223,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             'https://www.wsj.com/articles/a-rare-joint-interview-with-microsoft-ceo-satya-nadella-and-bill-gates-1506358852',
             'https://www.youtube.com/watch?v=rOqMawDj0LQ',
             'https://qz.com/1054323/bill-gates-will-have-no-microsoft-msft-shares-by-mid-2019-at-his-current-rate/']
+            """
             visited_queries.add(query)
 
             for url in URLs:
@@ -290,32 +292,31 @@ if __name__ == '__main__':
     api_key = GOOGLE_API
     engine_id = GOOGLE_ENGINE_ID
     r = 4 # Work_For
-    t = 0.1
+    t = 0.3
     q = "bill gates microsoft"
     k = 2
 
-    # if len(sys.argv) > 1 and sys.argv[1] == 'test':
-    #     main(api_key, engine_id, r, t, q, k)
-    #
-    # if len(sys.argv) >= 0 and len(sys.argv) < 7:
-    #     print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
-    #         "<google api key> is your Google Custom Search API Key\n", \
-    #         "<google engine id> is your Google Custom Search Engine ID\n", \
-    #         "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
-    #         "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
-    #         "which is the minimum extraction confidence that we request for the tuples in the output\n" \
-    #         "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
-    #         "a plausible tuple for the relation to extract \n" \
-    #         "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
-    #     sys.exit()
-    #
-    # if len(sys.argv) > 1:
-    #     api_key = sys.argv[1]
-    #     engine_id = sys.argv[2]
-    #     r = int(sys.argv[3])
-    #     t = float(sys.argv[4])
-    #     q = sys.argv[5]
-    #     k = sys.argv[6]
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        main(api_key, engine_id, r, t, q, k)
+    if len(sys.argv) >= 0 and len(sys.argv) < 7:
+         print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
+             "<google api key> is your Google Custom Search API Key\n", \
+             "<google engine id> is your Google Custom Search Engine ID\n", \
+             "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
+             "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
+             "which is the minimum extraction confidence that we request for the tuples in the output\n" \
+             "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
+             "a plausible tuple for the relation to extract \n" \
+             "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
+         sys.exit()
+
+    if len(sys.argv) > 1:
+         api_key = sys.argv[1]
+         engine_id = sys.argv[2]
+         r = int(sys.argv[3])
+         t = float(sys.argv[4])
+         q = sys.argv[5]
+         k = sys.argv[6]
 
     relation_group = groups[r - 1]
 
@@ -323,8 +324,8 @@ if __name__ == '__main__':
     #    Print Format - Parameters
     ##################################
     print 'Parameters:\n' \
-          'Client key      = ', GOOGLE_API, '\n'\
-          'Engine key      = ', GOOGLE_ENGINE_ID, '\n'\
+          'Client key      = ', api_key, '\n'\
+          'Engine key      = ', engine_id, '\n'\
           'Relation        = ', relation_group, '\n'\
           'Threshold       = ', t, '\n' \
           'Query           = ', q, '\n'\
