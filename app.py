@@ -292,7 +292,7 @@ if __name__ == '__main__':
     api_key = GOOGLE_API
     engine_id = GOOGLE_ENGINE_ID
     r = 4 # Work_For
-    t = 0.3
+    t = 0.35
     q = "bill gates microsoft"
     k = 2
 
