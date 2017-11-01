@@ -206,6 +206,21 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
 
     relation_group = groups[relation_id-1]
 
+    ##################################
+    #    Print Format - Parameters
+    ##################################
+    print 'Parameters:\n' \
+          'Client key      = ', api_key, '\n' \
+          'Engine key      = ', engine_id, '\n' \
+          'Relation        = ', relation_group, '\n' \
+          'Threshold       = ', threshold, '\n' \
+          'Query           = ', query, '\n' \
+          '# of Tuples     = ', k
+    ###################################
+    #    End of Printing Parameters
+    ###################################
+
+
     visited_tuples = set()
     visited_urls = set()
     visited_queries = set()
@@ -293,7 +308,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1 and sys.argv[1] == 'test':
         main(api_key, engine_id, r, t, q, k)
-    if len(sys.argv) >= 0 and len(sys.argv) < 7:
+    if len(sys.argv) >= 0 and len(sys.argv) < 7 and sys.argv[1] != 'test':
          print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
              "<google api key> is your Google Custom Search API Key\n", \
              "<google engine id> is your Google Custom Search Engine ID\n", \
@@ -312,23 +327,6 @@ if __name__ == '__main__':
          t = float(sys.argv[4])
          q = sys.argv[5]
          k = sys.argv[6]
-
-    relation_group = groups[r - 1]
-
-    ##################################
-    #    Print Format - Parameters
-    ##################################
-    print 'Parameters:\n' \
-          'Client key      = ', api_key, '\n'\
-          'Engine key      = ', engine_id, '\n'\
-          'Relation        = ', relation_group, '\n'\
-          'Threshold       = ', t, '\n' \
-          'Query           = ', q, '\n'\
-          '# of Tuples     = ', k
-    ###################################
-    #    End of Printing Parameters
-    ###################################
-
 
     main(api_key, engine_id, r, t, q, k)
 
