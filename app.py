@@ -255,7 +255,6 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                                 tuple_dict[hashing_key] = float(t[2])
                     except:
                         print "timeout, continue to next url..."
-                        raise
 
 
             # sort to generate new query
