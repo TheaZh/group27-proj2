@@ -215,9 +215,9 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             # Google CSE
             print 'query: ', query
             print "fetching urls form Google CSE..."
-            # URLs = search_google(api_key, engine_id, query)
+            URLs = search_google(api_key, engine_id, query)
 
-            URLs = ['https://www.biography.com/people/bill-gates-9307520']
+            # URLs = ['https://www.biography.com/people/bill-gates-9307520']
 
             visited_queries.add(query)
 
