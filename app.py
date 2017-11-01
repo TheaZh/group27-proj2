@@ -286,7 +286,7 @@ if __name__ == '__main__':
     r = 4 # Work_For
     t = 0.35
     q = "bill gates microsoft"
-    k = 4
+    k = 10
 
     if len(sys.argv) > 1 and sys.argv[1] == 'test':
         main(api_key, engine_id, r, t, q, k)
