@@ -108,7 +108,7 @@ def is_valid_relation(type1, type2, relation_group):
         valid_type2 = 'PEOPLE' if type_set[1] == 'PERSON' else type_set[1]
     else:
         valid_type2 = valid_type1
-    if type1 == valid_type1 and type2 == valid_type2:
+    if (type1 == valid_type1 and type2 == valid_type2) or (type1 == valid_type2 and type2 == valid_type1):
         return True
     return False
 
