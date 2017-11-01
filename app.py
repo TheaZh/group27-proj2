@@ -230,7 +230,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
         try:
             round = round + 1
             # Google CSE
-            print 'query: ', query
+            # print 'query: ', query
             print "fetching urls form Google CSE..."
             print "=========== Iteration: "+str(round)+" - Query: "+ query+" ==========="
             URLs = search_google(api_key, engine_id, query)
