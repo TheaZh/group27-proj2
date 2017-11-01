@@ -32,6 +32,7 @@ type_dict['Located_In'] = ['LOCATION']
 type_dict['OrgBased_In'] = ['ORGANIZATION', 'LOCATION']
 type_dict['Work_For'] = ['ORGANIZATION','PERSON']
 
+
 # get URLs list
 def search_google(google_api, google_engine_id, query):
     service = build("customsearch", "v1", developerKey=google_api)
@@ -41,6 +42,7 @@ def search_google(google_api, google_engine_id, query):
         URLs.append(item['link'])
         #print item,"\n"
     return URLs
+
 
 # get plain text of each url
 def get_plain_text(url):
@@ -56,12 +58,14 @@ def get_plain_text(url):
         text = text + ' ' + string.get_text()
     return [text.encode('utf-8')]
 
+
 # get a whole sentence
 def from_words_to_sentence(sentence):
     newsentence = ""
     for x in sentence.tokens:
         newsentence += " " + x.word
     return newsentence
+
 
 def is_filtered_by_entity_type(sentence, relation_group):
     entity_type_set = set()
@@ -71,6 +75,7 @@ def is_filtered_by_entity_type(sentence, relation_group):
         if entity_type not in entity_type_set:
             return True
     return False
+
 
 # get sentences from plain text
 def get_sentences(plain_txt, relation_group):
@@ -91,6 +96,20 @@ def get_sentences(plain_txt, relation_group):
     # print 'sentences: ', sentences
     return sentences
 
+
+# check valid relation
+def is_valid_relation(type1, type2, relation_group):
+    type_set = type_dict[relation_group]
+    valid_type1 = 'PEOPLE' if type_set[0] == 'PERSON' else type_set[0]
+    if len(type_set) == 2:
+        valid_type2 = 'PEOPLE' if type_set[1] == 'PERSON' else type_set[1]
+    else:
+        valid_type2 = valid_type1
+    if type1 == valid_type1 and type2 == valid_type2:
+        return True
+    return False
+
+
 # analyze sentences to extract tuples
 def extract_tuples(query_sentences, relation_group, threshold):
     # return [] # test
@@ -98,8 +117,8 @@ def extract_tuples(query_sentences, relation_group, threshold):
     num_of_valid_relations = 0 # the number of valid relations (including relations whose confidence below threshold)
     tuples = []
     type_set = type_dict[relation_group]
-    valid_type1 = 'PEOPLE' if type_set[0] is 'PERSON' else type_set[0]
-    valid_type2 = 'PEOPLE' if type_set[1] is 'PERSON' else type_set[1]
+    valid_type1 = 'PEOPLE' if type_set[0] == 'PERSON' else type_set[0]
+    valid_type2 = 'PEOPLE' if type_set[1] == 'PERSON' else type_set[1]
     # print 'valid types: ', valid_type1, '--', valid_type2
 
     try:
@@ -113,9 +132,9 @@ def extract_tuples(query_sentences, relation_group, threshold):
                 for relation in relations:
                     if not relation:
                         continue
-                    # print "Relation:::::::", relation, "\ntype:::::", relation.probabilities.keys()[0]
                     probability_dic = sorted(relation.probabilities.items(), key=lambda (k, v) : -float(v))
-                    if probability_dic[0][0] != '_NR':
+                    # print "Relation:::::::", relation, "\ntype:::::", relation.probabilities.keys()[0]
+                    if is_valid_relation(relation.entities[0].type, relation.entities[1].type, probability_dic[0][0]):
                         num_of_relations += 1  # count relations
                     if probability_dic[0][0] == relation_group:
                         word1 = relation.entities[0].value
@@ -128,7 +147,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
                             continue
                         num_of_valid_relations += 1  # count valid relations
                         print '============== EXTRACTED RELATION =============='
-                        print 'Sentence:' , sentence
+                        print 'Sentence:' , sentence.replace("-LRB-", "(").replace("-RRB-",")")
                         print 'Relation Type:', relation_group, ' | ' \
                               'Confidence=', confidence, ' | ' \
                               'EntityType1=', type1, ' | ' \
@@ -145,8 +164,8 @@ def extract_tuples(query_sentences, relation_group, threshold):
                             tup.append((word2, type2))
                             tup.append(round(confidence,3))
                             tuples.append(tup)
-                            print 'here is one tuple: the tuple looks like this:'
-                            print tup
+                            # print 'here is one tuple: the tuple looks like this:'
+                            # print tup
             except:
                 print '---------- Relation Error ----------'
                 raise
@@ -159,7 +178,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
 
 
 # result_tuples is a dic
-# key is (entity1 entity2) 
+# key is (entity1 entity2)
 # value is confidence
 def relation_print_format(sorted_tuple_list, relation_type):
     print 'Pruning relations below threshold...\n' \
@@ -171,8 +190,8 @@ def relation_print_format(sorted_tuple_list, relation_type):
         # key looks like : (Gates Microsoft)
         # value is 0.379
         tuple_set = tuple[0].split(' ')
-        entity1 = str(tuple_set[0] +' ('+('PEOPLE' if type_set[0] is 'PERSON' else type_set[0])+')').ljust(37)
-        entity2 = str(tuple_set[1] +' ('+('PEOPLE' if type_set[1] is 'PERSON' else type_set[1])+')')
+        entity1 = str(tuple_set[0] +' ('+('PEOPLE' if type_set[0] == 'PERSON' else type_set[0])+')').ljust(37)
+        entity2 = str(tuple_set[1] +' ('+('PEOPLE' if type_set[1] == 'PERSON' else type_set[1])+')')
         print "Relation Type: {}| Confidence: {}| Entity #1: {}|Entity #2: {}".format(relation_type.ljust(20), str(decimal.Decimal("%.3f" % float(tuple[1]))).ljust(10), entity1, entity2)
 
 
