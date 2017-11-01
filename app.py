@@ -215,9 +215,9 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             # Google CSE
             print 'query: ', query
             print "fetching urls form Google CSE..."
-            # URLs = search_google(api_key, engine_id, query)
+            URLs = search_google(api_key, engine_id, query)
 
-            URLs = ['https://www.youtube.com/watch?v=rOqMawDj0LQ']
+            # URLs = ['https://www.youtube.com/watch?v=rOqMawDj0LQ']
 
             visited_queries.add(query)
 
@@ -287,28 +287,28 @@ if __name__ == '__main__':
     t = 0.35
     q = "bill gates microsoft"
     k = 4
-    #
-    # if len(sys.argv) > 1 and sys.argv[1] == 'test':
-    #     main(api_key, engine_id, r, t, q, k)
-    # if len(sys.argv) >= 0 and len(sys.argv) < 7:
-    #      print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
-    #          "<google api key> is your Google Custom Search API Key\n", \
-    #          "<google engine id> is your Google Custom Search Engine ID\n", \
-    #          "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
-    #          "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
-    #          "which is the minimum extraction confidence that we request for the tuples in the output\n" \
-    #          "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
-    #          "a plausible tuple for the relation to extract \n" \
-    #          "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
-    #      sys.exit()
-    #
-    # if len(sys.argv) > 1:
-    #      api_key = sys.argv[1]
-    #      engine_id = sys.argv[2]
-    #      r = int(sys.argv[3])
-    #      t = float(sys.argv[4])
-    #      q = sys.argv[5]
-    #      k = sys.argv[6]
+
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        main(api_key, engine_id, r, t, q, k)
+    if len(sys.argv) >= 0 and len(sys.argv) < 7:
+         print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
+             "<google api key> is your Google Custom Search API Key\n", \
+             "<google engine id> is your Google Custom Search Engine ID\n", \
+             "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
+             "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
+             "which is the minimum extraction confidence that we request for the tuples in the output\n" \
+             "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
+             "a plausible tuple for the relation to extract \n" \
+             "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
+         sys.exit()
+
+    if len(sys.argv) > 1:
+         api_key = sys.argv[1]
+         engine_id = sys.argv[2]
+         r = int(sys.argv[3])
+         t = float(sys.argv[4])
+         q = sys.argv[5]
+         k = sys.argv[6]
 
     relation_group = groups[r - 1]
 
