@@ -13,7 +13,7 @@ Group Member
 
 Files
 --------
-	
+
   	group27-proj2
 	├── NLPCore.py
 	├── README.md
@@ -37,17 +37,17 @@ Run
 		# make sure you do this
 		sudo apt-get update
 		# remeber to choose to agree the license
-		sudo apt-get install oracle-java8-installer 
+		sudo apt-get install oracle-java8-installer
 
 	Get Stanford CoreNLP
 
 		wget http://nlp.stanford.edu/software/stanford-corenlp-full-2017-06-09.zip
 		sudo apt-get install unzip
 		unzip stanford-corenlp-full-2017-06-09.zip        
-		
+
 
 2. Clone project   
-	
+
 	Install git if you haven't
 
 		sudo apt-get install git
@@ -55,21 +55,21 @@ Run
 	then, clone project
 
 		git clone https://github.com/TheaZh/group27-proj2.git
-       
-       
+
+
 3. Navigate to folder
-      
+
 		cd group27_proj2
-   
+
 4. Install dependencies
-  
+
 		sudo apt install python-pip
 		sudo pip install -r requirements.txt
 
 5. Run program
 
 		python app.py <google api key> <google engine id> <r> <t> <q> <k>
-		
+
    \<google api key> -- your Google Custom Search API Key
 
    \<google engine id> -- your Google Custom Search Engine ID
@@ -77,9 +77,9 @@ Run
    \<r> -- an integer between 1 and 4, indicating the relation to extract
 
    \<t> -- the extraction confidence threshold
-   
+
    \<q> -- seed query
-   
+
    \<k> -- the number of tuples that we request in the output
 
 
@@ -123,5 +123,7 @@ Internal Design
 
 Step 3
 --------
-
-
+Use a set to contain all the visited URLs. Privide the unvisited url to Google CSE.     
+a. Get content of the webpage according to the url within a try clause in case of timeout.      
+b. Extract plain text from the html document using BeautifulSoup.       
+c. Use Stanford CoreNLP for entity detecting and relation extraction. __Pipeline1__ (entity detecting): use pipeline1 to extract entity from the plaintext sentence. If there are entities that follows the relation group (e.g. relation group is Work_For, we only need the sentence which contains entity type of both PEOPLE and ORGANIZATION), put this sentence to next pipeline. __Pipeline2__ (relation extraction): use pipeline2 to extract relations from the sentences passed from pipeline1. Only when the relation type of relation group is the highest among all types, the tuple is considered a new candidate. After obtaining a new candidate, do the following: decide if the entity types are related to the relation group and filter the unrelated ones (similar process to pipeline1). And check the confidence, if confidence >= threshold, do the following: update the tuple confidence if we have already obtained this relation tuple before, select the higher confidence value and update the dictionary. If it is not in the dictionary, add it.
