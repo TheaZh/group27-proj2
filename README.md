@@ -119,7 +119,7 @@ Internal Design
 
 6. While loop
 
-The whole algorithm is in a while loop. In each round, the dictionary we talked above will be sorted according to it value (i.e. tuple confidence). And we have a set contains used query. If in this round, the result dictionary contains more than k tuples, we print the top-k tuples sorted in decreasing order by extraction confidence, and then stop the program. If there are less than k tuples, we select one tuple with highest confidence that has not yet been used for querying in result dictionary. And create a new tuple with both entity values together, and start a new round.
+	The whole algorithm is in a while loop. In each round, the dictionary we talked above will be sorted according to it value (i.e. tuple confidence). And we have a set contains used query. If in this round, the result dictionary contains more than k tuples, we print the top-k tuples sorted in decreasing order by extraction confidence, and then stop the program. If there are less than k tuples, we select one tuple with highest confidence that has not yet been used for querying in result dictionary. And create a new tuple with both entity values together, and start a new round.
 
 Step 3
 --------
