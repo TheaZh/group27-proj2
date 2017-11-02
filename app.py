@@ -226,7 +226,6 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
     #    End of Printing Parameters
     ###################################
 
-
     visited_tuples = set()
     visited_urls = set()
     visited_queries = set()
@@ -240,11 +239,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             print "fetching urls form Google CSE..."
             print "=========== Iteration: "+str(round)+" - Query: "+ query+" ==========="
             URLs = search_google(api_key, engine_id, query)
-
             # URLs = ['https://www.youtube.com/watch?v=rOqMawDj0LQ']
-
             visited_queries.add(query)
-
             for url in URLs:
                 if url not in visited_urls:
                     print "Processing: ", url
@@ -273,8 +269,6 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                                 tuple_dict[hashing_key] = float(t[2])
                     except:
                         print "timeout, continue to next url..."
-
-
             # sort to generate new query
             # print tuple_dict
             sorted_tuple_list = sorted(tuple_dict.items(), key=lambda (k, v): -v)
@@ -299,8 +293,6 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
         except:
             print "---------While Loop Error-----------"
             raise
-
-
     print 'Program reached ' + str(k) + ' number of tuples. Shutting down...'
     sys.exit(0)
 
