@@ -70,6 +70,10 @@ Run
 
 		python app.py <google api key> <google engine id> <r> <t> <q> <k>
 		
+	For example,
+		
+		python app.py AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo 018258045116810257593:z1fmkqqt_di 4 0.35 "bill gates microsoft" 10
+		
 	\<google api key> -- your Google Custom Search API Key
 
 	\<google engine id> -- your Google Custom Search Engine ID
@@ -82,9 +86,6 @@ Run
 
 	\<k> -- the number of tuples that we request in the output
 
-	For example,
-		
-		python app.py AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo 018258045116810257593:z1fmkqqt_di 4 0.35 "bill gates microsoft" 10
 
 
 
