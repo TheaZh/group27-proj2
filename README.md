@@ -103,7 +103,7 @@ Internal Design
 
 2. Get plain text of one websit
 
-	We use urllib2 package to get the html doc of a website. In order to get useful plain text, we rip content with tag “script”, “style” out. And since there will be lots of spans. We add “.” at the start and the end of each span text, avoiding several spans forming a sentences, which is not valid. After that, we concatenate every part of plain text as a whole string. And this string will be passed to Stanford NLP pipeline1.
+	We use urllib2 package to get the html doc of a website. In order to get useful plain text, we rip content with tag “script”, “style” out. And since there will be lots of spans. We add “.” at the start and the end of each span text, avoiding several spans forming a sentences, which is not valid. After that, we concatenate every part of plain text as a whole string. And this string will be passed to Stanford NLP pipeline1. If the program have a time out when we retrieve this website, it will skip this website and move on.
 
 3. Process Sentences
 
