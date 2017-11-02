@@ -16,11 +16,9 @@ Files
 	
   	group27-proj2
 	├── NLPCore.py
-	├── NLPCore.pyc
 	├── README.md
 	├── app.py
 	├── data.py
-	├── data.pyc
 	├── props.properties
 	├── requirements.txt
 	└── transcript.txt
