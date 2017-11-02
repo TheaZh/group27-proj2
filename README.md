@@ -62,6 +62,18 @@ Run
 5. Run program
 
 		python app.py <google api key> <google engine id> <r> <t> <q> <k>
+		
+   \<google api key> -- your Google Custom Search API Key
+
+   \<google engine id> -- your Google Custom Search Engine ID
+
+   \<r> -- an integer between 1 and 4, indicating the relation to extract
+
+   \<t> -- the extraction confidence threshold
+   
+   \<q> -- seed query
+   
+   \<k> -- the number of tuples that we request in the output
 
 
 Keys
