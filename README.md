@@ -59,7 +59,7 @@ Run
 
 3. Navigate to folder
 
-		cd ./group27_proj2
+		cd ./group27-proj2
 
 4. Install dependencies
 
