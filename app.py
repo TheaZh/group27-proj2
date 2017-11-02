@@ -294,13 +294,14 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                     break
             if not found_a_new_query:
                 print "Cannot find >=k results with q and k for t. Exit."
-                break
+                sys.exit(0)
+                
         except:
             print "---------While Loop Error-----------"
             raise
 
 
-    print 'End of story......................................................'
+    print 'Program reached ' + str(k) + ' number of tuples. Shutting down...'
     sys.exit(0)
 
 
