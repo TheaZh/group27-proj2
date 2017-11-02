@@ -59,7 +59,7 @@ Run
 
 3. Navigate to folder
 
-		cd group27-proj2
+		cd ./group27-proj2
 
 4. Install dependencies
 
@@ -70,17 +70,23 @@ Run
 
 		python app.py <google api key> <google engine id> <r> <t> <q> <k>
 
-   \<google api key> -- your Google Custom Search API Key
+	For example,
 
-   \<google engine id> -- your Google Custom Search Engine ID
+		python app.py AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo 018258045116810257593:z1fmkqqt_di 4 0.35 "bill gates microsoft" 10
 
-   \<r> -- an integer between 1 and 4, indicating the relation to extract
+	\<google api key> -- your Google Custom Search API Key
 
-   \<t> -- the extraction confidence threshold
+	\<google engine id> -- your Google Custom Search Engine ID
 
-   \<q> -- seed query
+	\<r> -- an integer between 1 and 4, indicating the relation to extract
 
-   \<k> -- the number of tuples that we request in the output
+	\<t> -- the extraction confidence threshold
+
+	\<q> -- seed query
+
+	\<k> -- the number of tuples that we request in the output
+
+
 
 
 
@@ -110,17 +116,17 @@ Internal Design
 
 6. While loop
 
-	The whole algorithm is in a while loop. In each round, the dictionary we talked above will be sorted according to it value (i.e. tuple confidence). And we have a set contains used query. If in this round, the result dictionary contains more than k tuples, we print the top-k tuples sorted in decreasing order by extraction confidence, and then stop the program. If there are less than k tuples, we select one tuple with highest confidence that has not yet been used for querying in result dictionary. And create a new tuple with both entity values together, and start a new round.
+	The whole algorithm is in a while loop. In each round, the dictionary we talked above will be sorted according to it value (i.e. tuple confidence). And we have a set containing used query. If in this round, the result dictionary contains more than k tuples, we print the top-k tuples sorted in decreasing order by extraction confidence, and then stop the program. If there are less than k tuples, we select one tuple with highest confidence that has not yet been used for querying in result dictionary. And create a new tuple with both entity values together, and start a new round.
 
 Step 3
 --------
-Use a set to contain all the visited URLs. Privide the unvisited url to Google CSE.
+Use a set to contain all the visited URLs. When process urls, only process unvisited ones.
 
 * Get content of the webpage according to the url within a try clause in case of timeout.      
-* Extract plain text from the html document using BeautifulSoup.       
+* Extract plain text from the html document using BeautifulSoup. The original html doc is much likely to contain many texts that are useless. For example, there are texts in <style> tag, which is useless and may influence our result. Therefore, we filter this useless texts to get more accurate result.
 * Use Stanford CoreNLP for entity detecting and relation extraction:       
-__Pipeline1__ (entity detecting): use pipeline1 to extract entity from the plaintext sentence. If there are entities that follows the relation group (e.g. relation group is Work_For, we only need the sentence which contains entity type of both PEOPLE and ORGANIZATION), put this sentence to next pipeline.     
-__Pipeline2__ (relation extraction): use pipeline2 to extract relations from the sentences passed from pipeline1. Only when the relation type of relation group is the highest among all types, the tuple is considered a new candidate. After obtaining a new candidate, do the following: decide if the entity types are related to the relation group and filter the unrelated ones (similar process to pipeline1). And check the confidence, if confidence >= threshold, do the following: update the tuple confidence if we have already obtained this relation tuple before, select the higher confidence value and update the dictionary. If it is not in the dictionary, add it.
+__Pipeline1__ (entity detecting): use pipeline1 to extract sentences from the plaintext. In each sentence, If there are entities that follows the relation group (e.g. relation group is Work_For, we only need the sentence which contains entity type of both PEOPLE and ORGANIZATION), add this sentence to our sentences list. Otherwise, we skip this sentence.     
+__Pipeline2__ (relation extraction): use pipeline2 to extract relations from the sentences passed from pipeline1. For a relation of one sentence, sort its probabilities.item() in descending order by confidence score. Then, we can get the most confident relation type is the first item. If this relation type is same with the one we are looking for, the tuple is considered a new candidate. After obtaining a new candidate, firstly decide if the entity types are related to the relation group and filter the invalid ones. Then check the confidence score, if confidence score is greater than or equal to threshold, update the tuple confidence if we have already obtained this relation tuple before, select the higher confidence value and update the dictionary. If it is not in the dictionary, add it.
 
 
 Keys
