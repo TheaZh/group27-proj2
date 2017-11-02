@@ -325,6 +325,6 @@ if __name__ == '__main__':
          r = int(sys.argv[3])
          t = float(sys.argv[4])
          q = sys.argv[5]
-         k = sys.argv[6]
+         k = int(sys.argv[6])
 
     main(api_key, engine_id, r, t, q, k)
