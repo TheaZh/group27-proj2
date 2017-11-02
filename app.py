@@ -280,7 +280,8 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             found_a_new_query = False
             for tup in sorted_tuple_list:
                 # potential_query = tup[0][0] + " " + tup[1][0]
-                potential_query = tup[0]
+                word_set = tup[0].split(',')
+                potential_query = word_set[0] + " " + word_set[2]
                 if potential_query not in visited_queries:
                     query = potential_query
                     found_a_new_query = True
@@ -291,7 +292,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                 sys.exit(0)
 
         except:
-            print "---------While Loop Error-----------"
+            # print "---------While Loop Error-----------"
             raise
     print 'Program reached ' + str(k) + ' number of tuples. Shutting down...'
     sys.exit(0)
