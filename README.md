@@ -114,7 +114,7 @@ Internal Design
 
 Step 3
 --------
-Use a set to contain all the visited URLs. Privide the unvisited url to Google CSE.
+Use a set to contain all the visited URLs. When process urls, only process unvisited ones.
 
 * Get content of the webpage according to the url within a try clause in case of timeout.      
 * Extract plain text from the html document using BeautifulSoup. The original html doc is much likely to contain many texts that are useless. For example, there are texts in <stype> tag, which is useless and may influence our result. Therefore, we filter this useless texts to get more accurate result.
