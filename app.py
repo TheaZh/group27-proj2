@@ -305,9 +305,9 @@ if __name__ == '__main__':
     q = "bill gates microsoft"
     k = 10
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    if len(sys.argv) == 2 and sys.argv[1] == 'test':
         main(api_key, engine_id, r, t, q, k)
-    if len(sys.argv) >= 0 and len(sys.argv) < 7 and sys.argv[1] != 'test':
+    if len(sys.argv) != 7:
          print "Usage: python app.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
              "<google api key> is your Google Custom Search API Key\n", \
              "<google engine id> is your Google Custom Search Engine ID\n", \
@@ -319,7 +319,7 @@ if __name__ == '__main__':
              "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
          sys.exit()
 
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 7:
          api_key = sys.argv[1]
          engine_id = sys.argv[2]
          r = int(sys.argv[3])
