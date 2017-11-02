@@ -21,31 +21,40 @@ Run
 --------
 1. Install Java 8 and download Stanford CoreNLP software suite
 
-    Install Java 8 (the default JDK is Java 7 under ubuntu 14.04, so we installed Java 8 in other ways)
 
-			# Run under Ubuntu 14.04 LTS
-			sudo apt-get update
-			sudo add-apt-repository ppa:webupd8team/java
-			# make sure you do this
-			sudo apt-get update
-			# remeber to choose to agree the license
-			sudo apt-get install oracle-java8-installer 
+   Install Java 8 (the default JDK is Java 7 under ubuntu 14.04, so we installed Java 8 in other ways)
+
+
+		# Run under Ubuntu 14.04 LTS
+		sudo apt-get update
+		sudo add-apt-repository ppa:webupd8team/java
+		# make sure you do this
+		sudo apt-get update
+		# remeber to choose to agree the license
+		sudo apt-get install oracle-java8-installer 
 
    Get Stanford CoreNLP
+
 
 		wget http://nlp.stanford.edu/software/stanford-corenlp-full-2017-06-09.zip
 		sudo apt-get install unzip
 		unzip stanford-corenlp-full-2017-06-09.zip        
+		
 
 2. Clone project   
         
+	
       Install git if you haven't
 
-       		sudo apt-get install git
+	
+		sudo apt-get install git
+	
 	
       then, clone project
       
+      
         	git clone https://github.com/TheaZh/group27-proj2.git
+       
        
 3. Navigate to folder
       
