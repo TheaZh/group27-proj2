@@ -295,7 +295,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             if not found_a_new_query:
                 print "Cannot find >=k results with q and k for t. Exit."
                 sys.exit(0)
-                
+
         except:
             print "---------While Loop Error-----------"
             raise
@@ -336,100 +336,3 @@ if __name__ == '__main__':
          k = sys.argv[6]
 
     main(api_key, engine_id, r, t, q, k)
-
-
-    '''
-    if len(sys.argv) >=0 and len(sys.argv)<7:
-        print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
-            "<google api key> is your Google Custom Search API Key\n", \
-            "<google engine id> is your Google Custom Search Engine ID\n", \
-            "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
-            "<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold,\" " \
-            "which is the minimum extraction confidence that we request for the tuples in the output\n"\
-            "<q> is a \"seed query,\" which is a list of words in double quotes corresponding to " \
-            "a plausible tuple for the relation to extract \n"\
-            "<k> is an integer greater than 0, indicating the number of tuples that we request in the output\n"
-        sys.exit()
-
-    google_api = sys.argv[1]
-    google_engine_id = sys.argv[2]
-    relation_id = sys.argv[3]  # relation to extract
-                     # 1 is for Live_In, 2 is for Located_In, 3 is for OrgBased_In, and 4 is for Work_For
-    if relation_id<1 or relation_id>4:
-        print "<r> is an integer between 1 and 4, please input a valid value"
-        sys.exit()
-    threshold = sys.argv[4]  # extraction confidence threshold
-    if threshold>1 or threshold<0:
-        print '<t> is a real number between 0 and 1, indicating the \"extraction confidence threshold, '
-        print 'please input a valid value'
-        sys.exit()
-    query = sys.argv[5]  # seed query
-    number_of_tuples = sys.argv[6]  # the number of tuples that we request in the output
-
-
-    # start iteration
-    result_tuples = []
-
-    for url in URLs:
-        plain_text = get_plain_text(url)
-        sentences = get_sentences(plain_text)
-        tuples = extract_tuples(sentences, relation_group, threshold)
-        if len(tuples) <1:
-            continue
-        else:
-            result_tuples.extend(tuples)
-    result_tuples = sorted(result_tuples, key=lambda x: -float(x[2]))
-
-
-
-
-    #############################################
-    #               Debug
-    #############################################
-
-
-    relation_id = 4
-    query = "bill gates microsoft".encode('utf-8')
-    threshold = 0.22
-
-
-    relation_group = groups[relation_id-1]
-    number_of_tuples = 10
-
-    # get 10 urls
-    # URLs = search_google(GOOGLE_API, GOOGLE_ENGINE_ID, query)
-
-    URLs = ['https://news.microsoft.com/exec/bill-gates/','https://en.wikipedia.org/wiki/Bill_Gates','https://www.theverge.com/2017/8/15/16148370/bill-gates-microsoft-shares-sale-2017', 'https://www.biography.com/people/bill-gates-9307520', 'http://www.telegraph.co.uk/technology/0/bill-gates/', 'https://www.cnbc.com/2017/09/25/bill-gates-microsoft-ceo-satya-nadella-talk-about-leadership.html', 'http://www.zdnet.com/article/bill-gates-stake-in-microsoft-is-now-just-1-3-percent/', 'https://www.wsj.com/articles/a-rare-joint-interview-with-microsoft-ceo-satya-nadella-and-bill-gates-1506358852', 'https://twitter.com/billgates', 'https://www.youtube.com/watch?v=rOqMawDj0LQ']
-
-
-    print "URLs: ", URLs
-    # test_URLs = []
-    # test_URLs.append(URLs[0])
-    result_tuples = []
-
-    for url in URLs:
-        print 'Processing: ' + url
-        plain_text = get_plain_text(url)
-        # plain_text = ['William Henry Gates III (born October 28, 1955) is an American business magnate , investor , author , philanthropist , and co-founder of the Microsoft Corporation along with Paul Allen.']
-        sentences = get_sentences(plain_text)
-        # print sentences
-        tuples = []
-        tuples.extend(extract_tuples(sentences, relation_group, threshold))
-        if len(tuples) < 1:
-            continue
-        else:
-            result_tuples.extend(tuples)
-
-    # sorted by confidence (descending)
-    result_tuples = sorted(result_tuples, key=lambda x: -float(x[2]))
-
-    relation_print_format(result_tuples, relation_group)
-    # print "tuples:  " ,result_tuples
-    # for res in result_tuples:
-    #     print res[0], '--', res[1], '--', res[2]
-
-    #############################################
-    #             End of Debug
-    #############################################
-
-    '''
