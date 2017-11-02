@@ -51,7 +51,7 @@ def get_plain_text(url):
     html_doc = response.read() # get html doc
     soup = BeautifulSoup(html_doc,'html.parser')
     # kill all script and style elements
-    for script in soup(["script", "style", "sup"]):
+    for script in soup(["script", "style", "sup","span"]):
         script.decompose()  # rip it out
     text = ''
     for string in soup.stripped_strings:
@@ -188,12 +188,13 @@ def extract_tuples(query_sentences, relation_group, threshold):
 # result_tuples is a dic
 # key is (entity1 entity2)
 # value is confidence
-def relation_print_format(sorted_tuple_list, relation_type):
+def relation_print_format(sorted_tuple_list, relation_type, k):
+    num = k if len(sorted_tuple_list)>=k else len(sorted_tuple_list)
     print 'Pruning relations below threshold...\n' \
-          'Number of tuples after pruning: ' , len(sorted_tuple_list) , '\n' \
+          'Number of tuples after pruning: ' , num , '\n' \
           '================== ALL RELATIONS ================='
     type_set = type_dict[relation_type]
-    for tuple in sorted_tuple_list:
+    for tuple in sorted_tuple_list[0:num]:
         # key looks like : (Gates, PEOPEL, Microsoft, ORGANIZATION)
         # value is 0.379
         tuple_set = tuple[0].split(',')
@@ -270,10 +271,10 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
 
 
             # sort to generate new query
-            print tuple_dict
+            # print tuple_dict
             sorted_tuple_list = sorted(tuple_dict.items(), key=lambda (k, v): -v)
             # looks like [('Corporation Allen', 0.268), ('Allen Corporation', 0.26)]
-            print sorted_tuple_list
+            # print sorted_tuple_list
 
             relation_print_format(sorted_tuple_list,relation_group)
 
