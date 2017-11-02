@@ -83,15 +83,6 @@ Run
    \<k> -- the number of tuples that we request in the output
 
 
-Keys
---------
-1. Google Custom Search API Key
-
-         AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo
-
-2. Google Custom Search Engine ID
-
-         018258045116810257593:z1fmkqqt_di
 
 Internal Design
 ---------
@@ -125,8 +116,19 @@ Step 3
 --------
 Use a set to contain all the visited URLs. Privide the unvisited url to Google CSE.
 
-&nbsp;&nbsp;&nbsp;&nbsp;a. Get content of the webpage according to the url within a try clause in case of timeout.      
-&nbsp;&nbsp;&nbsp;&nbsp;b. Extract plain text from the html document using BeautifulSoup.       
-&nbsp;&nbsp;&nbsp;&nbsp;c. Use Stanford CoreNLP for entity detecting and relation extraction.       
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__Pipeline1__ (entity detecting): use pipeline1 to extract entity from the plaintext sentence. If there are entities that follows the relation group (e.g. relation group is Work_For, we only need the sentence which contains entity type of both PEOPLE and ORGANIZATION), put this sentence to next pipeline.     
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__Pipeline2__ (relation extraction): use pipeline2 to extract relations from the sentences passed from pipeline1. Only when the relation type of relation group is the highest among all types, the tuple is considered a new candidate. After obtaining a new candidate, do the following: decide if the entity types are related to the relation group and filter the unrelated ones (similar process to pipeline1). And check the confidence, if confidence >= threshold, do the following: update the tuple confidence if we have already obtained this relation tuple before, select the higher confidence value and update the dictionary. If it is not in the dictionary, add it.
+* Get content of the webpage according to the url within a try clause in case of timeout.      
+* Extract plain text from the html document using BeautifulSoup.       
+* Use Stanford CoreNLP for entity detecting and relation extraction:       
+__Pipeline1__ (entity detecting): use pipeline1 to extract entity from the plaintext sentence. If there are entities that follows the relation group (e.g. relation group is Work_For, we only need the sentence which contains entity type of both PEOPLE and ORGANIZATION), put this sentence to next pipeline.     
+__Pipeline2__ (relation extraction): use pipeline2 to extract relations from the sentences passed from pipeline1. Only when the relation type of relation group is the highest among all types, the tuple is considered a new candidate. After obtaining a new candidate, do the following: decide if the entity types are related to the relation group and filter the unrelated ones (similar process to pipeline1). And check the confidence, if confidence >= threshold, do the following: update the tuple confidence if we have already obtained this relation tuple before, select the higher confidence value and update the dictionary. If it is not in the dictionary, add it.
+
+
+Keys
+--------
+1. Google Custom Search API Key
+
+         AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo
+
+2. Google Custom Search Engine ID
+
+         018258045116810257593:z1fmkqqt_di
