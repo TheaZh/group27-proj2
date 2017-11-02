@@ -59,6 +59,10 @@ Run
 		sudo apt install python-pip
 		sudo pip install -r requirements.txt
 
+5. Run program
+
+		python app.py <google api key> <google engine id> <r> <t> <q> <k>
+
 
 Keys
 --------
