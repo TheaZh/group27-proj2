@@ -5,9 +5,6 @@ from bs4 import BeautifulSoup
 from NLPCore import NLPCoreClient
 import decimal
 
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
 GOOGLE_API = "AIzaSyARFSgO3Kiuu3IOtEL8UwdIbrS7SiB43qo"
 GOOGLE_ENGINE_ID = "018258045116810257593:z1fmkqqt_di"
 
@@ -41,7 +38,6 @@ def search_google(google_api, google_engine_id, query):
     URLs = []
     for item in res['items']:
         URLs.append(item['link'])
-        #print item,"\n"
     return URLs
 
 
@@ -88,20 +84,13 @@ def get_sentences(plain_txt, relation_group):
     doc = client.annotate(text=plain_txt, properties=properties_pipeline1)
     sentences = []
 
-    # print doc.tree_as_string()
-
     for sentence in doc.sentences:
-        # print "for this sentence: it contains: "
-        # print sentence.__str__()
         if is_filtered_by_entity_type(sentence, relation_group):
             continue
         newsentence = from_words_to_sentence(sentence)
         if len(newsentence) > 2000:
             continue
-        # print "----" + newsentence
-        # newsentence = newsentence.encode('utf8','replace')
         sentences.append(newsentence)
-    # print 'sentences: ', sentences
     return sentences
 
 
@@ -127,10 +116,6 @@ def extract_tuples(query_sentences, relation_group, threshold):
     num_of_valid_relations = 0 # the number of valid relations (including relations whose confidence below threshold)
     tuples = []
     type_set = type_dict[relation_group]
-    # valid_type1 = 'PEOPLE' if type_set[0] == 'PERSON' else type_set[0]
-    # valid_type2 = 'PEOPLE' if type_set[1] == 'PERSON' else type_set[1]
-    # print 'valid types: ', valid_type1, '--', valid_type2
-
     try:
         for sentence in query_sentences:
             # print " --- ", sentence
@@ -143,7 +128,6 @@ def extract_tuples(query_sentences, relation_group, threshold):
                     if not relation:
                         continue
                     probability_dic = sorted(relation.probabilities.items(), key=lambda (k, v) : -float(v))
-                    # print "Relation:::::::", relation, "\ntype:::::", relation.probabilities.keys()[0]
                     if is_valid_relation(relation.entities[0].type, relation.entities[1].type, probability_dic[0][0]):
                         num_of_relations += 1  # count relations
 
@@ -152,9 +136,9 @@ def extract_tuples(query_sentences, relation_group, threshold):
                         type1 = relation.entities[0].type
                         word2 = relation.entities[1].value
                         type2 = relation.entities[1].type
-                        # print "we get a tuple: ", word1, type1, word2, type2
+
                         confidence = float(relation.probabilities[relation_group])
-                        # print "type::::", type1, "--", type2
+
                         if not is_valid_relation(type1, type2, relation_group):
                             # print "however we dont want it"
                             continue
@@ -177,8 +161,7 @@ def extract_tuples(query_sentences, relation_group, threshold):
                             tup.append((word2, type2))
                             tup.append(round(confidence,3))
                             tuples.append(tup)
-                            # print 'here is one tuple: the tuple looks like this:'
-                            # print tup
+
             except:
                 print '---------- Relation Error ----------'
                 raise
@@ -259,7 +242,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                             # remove dup
                             # tup -----  [('Gates', 'PEOPLE'), ('Microsoft', 'ORGANIZATION'), 0.379]
                             for t in tuples:
-                                # hashing_key = t[0][0]+","+t[0][1]+";"+t[1][0]+","+t[1][1]
+
                                 hashing_key = t[0][0]+","+t[0][1]+","+t[1][0]+","+t[1][1]
                                 # word1 , type1, word2, type2
                                 if hashing_key in visited_tuples:
