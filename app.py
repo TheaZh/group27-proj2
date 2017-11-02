@@ -316,7 +316,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'test':
         main(api_key, engine_id, r, t, q, k)
     if len(sys.argv) >= 0 and len(sys.argv) < 7 and sys.argv[1] != 'test':
-         print "Usage: python Main.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
+         print "Usage: python app.py <google api key> <google engine id> <r> <t> <q> <k>\n", \
              "<google api key> is your Google Custom Search API Key\n", \
              "<google engine id> is your Google Custom Search Engine ID\n", \
              "<r> is an integer between 1 and 4, indicating the relation to extract\n", \
