@@ -51,8 +51,13 @@ def get_plain_text(url):
     html_doc = response.read() # get html doc
     soup = BeautifulSoup(html_doc,'html.parser')
     # kill all script and style elements
-    for script in soup(["script", "style", "sup","span"]):
+    for script in soup(["script", "style", "sup"]):
         script.decompose()  # rip it out
+
+    # seperate text with span content
+    for script in soup.find_all('span'):
+        script.string = '. '+ script.get_text() + '.'
+
     text = ''
     for string in soup.stripped_strings:
     # for string in soup.find_all('p'):
@@ -276,7 +281,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
             # looks like [('Corporation Allen', 0.268), ('Allen Corporation', 0.26)]
             # print sorted_tuple_list
 
-            relation_print_format(sorted_tuple_list,relation_group)
+            relation_print_format(sorted_tuple_list,relation_group, k)
 
             found_a_new_query = False
             for tup in sorted_tuple_list:
