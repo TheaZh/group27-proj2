@@ -271,7 +271,7 @@ def main(api_key, engine_id, relation_id, threshold, query, k):
                     # print "potential_query is :", potential_query
                     break
             if not found_a_new_query:
-                print "Cannot find >=k results with q and k for t. Exit."
+                print 'Cannot find at least ' + str(k) + ' results. Exit.'
                 sys.exit(0)
 
         except:
